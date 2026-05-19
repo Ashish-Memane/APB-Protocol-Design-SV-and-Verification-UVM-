@@ -1,3 +1,23 @@
+//////////////////////////////////////////////////////////////////////////////////
+// Company: NA
+// Engineer: Ashish Memane
+// 
+// Create Date: 19.05.2026 12:26:29
+// Design Name: 
+// Module Name: apb_uart
+// Project Name: ABP_PROTOCOL_DESIGN
+// Target Devices: 
+// Tool Versions: VIVADO
+// Description: APB_UART
+// 
+// Dependencies: 
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
+
 module apb_uart (
     //==================================================
     // APB INTERFACE
