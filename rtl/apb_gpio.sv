@@ -4,7 +4,7 @@
 // 
 // Create Date: 19.05.2026 12:26:29
 // Design Name: 
-// Module Name: apb_top
+// Module Name: apb_gpio
 // Project Name: ABP_PROTOCOL_DESIGN
 // Target Devices: 
 // Tool Versions: VIVADO
