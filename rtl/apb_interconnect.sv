@@ -50,7 +50,7 @@ module apb_interconnect
     // ADDRESS DECODE
     //--------------------------------------------------
 
-    always_comb
+    always @(*)
     begin
 
         PSEL_GPIO = 0;
