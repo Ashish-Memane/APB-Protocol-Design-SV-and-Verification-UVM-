@@ -1,3 +1,23 @@
+//////////////////////////////////////////////////////////////////////////////////
+// Company: NA
+// Engineer: Ashish Memane
+// 
+// Create Date: 19.05.2026 12:26:29
+// Design Name: 
+// Module Name: apb_spi
+// Project Name: ABP_PROTOCOL_DESIGN
+// Target Devices: 
+// Tool Versions: VIVADO
+// Description: APB_SPI (TESTBENCH)
+// 
+// Dependencies: 
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
+
 module tb_apb_spi;
 
   //==================================================
