@@ -59,4 +59,85 @@ PSEL + PENABLE handshake
 PREADY for wait states
 PSLVERR for error handling
 
+## DUT Architecture
 
+```text
+                +----------------+
+                |   APB MASTER   |
+                +----------------+
+                         |
+                         |
+                +----------------+
+                | INTERCONNECT   |
+                +----------------+
+                  |      |      |
+                  |      |      |
+               GPIO    UART    SPI
+```
+
+---
+
+# UVM ENVIRONMENT ARCHITECTURE
+
+```text
+
+                     +-------------------+
+                     |     TEST          |
+                     +-------------------+
+                               |
+                     +-------------------+
+                     |       ENV         |
+                     +-------------------+
+                      /        |        \
+                     /         |         \
+                    /          |          \
+          +-------------+ +-------------+ +-------------+
+          | APB AGENT   | | UART AGENT  | | SPI AGENT   |
+          +-------------+ +-------------+ +-------------+
+                  |
+          +-------------+
+          | SCOREBOARD  |
+          +-------------+
+```
+
+---
+
+# DIRECTORY STRUCTURE
+
+```text
+uvm_tb/
+│
+├── interfaces/
+│   ├── apb_if.sv
+│   ├── uart_if.sv
+│   └── spi_if.sv
+│
+├── apb_agent/
+│   ├── apb_transaction.sv
+│   ├── apb_sequence.sv
+│   ├── apb_sequencer.sv
+│   ├── apb_driver.sv
+│   ├── apb_monitor.sv
+│   └── apb_agent.sv
+│
+├── uart_agent/
+│   ├── uart_transaction.sv
+│   ├── uart_driver.sv
+│   ├── uart_monitor.sv
+│   └── uart_agent.sv
+│
+├── spi_agent/
+│   ├── spi_transaction.sv
+│   ├── spi_driver.sv
+│   ├── spi_monitor.sv
+│   └── spi_agent.sv
+│
+├── env/
+│   ├── scoreboard.sv
+│   ├── virtual_sequencer.sv
+│   └── apb_env.sv
+│
+├── tests/
+│   └── apb_base_test.sv
+│
+└── tb_top.sv
