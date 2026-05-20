@@ -126,6 +126,10 @@ module apb_master (
 
           if (PREADY) begin
 
+            if (PSLVERR) begin
+              $display("APB ERROR");
+            end
+
             if (!PWRITE) rdata <= PRDATA;
 
             done <= 1'b1;
@@ -146,3 +150,4 @@ module apb_master (
   end
 
 endmodule
+
