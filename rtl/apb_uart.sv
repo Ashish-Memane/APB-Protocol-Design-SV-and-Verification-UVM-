@@ -9,7 +9,7 @@
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
-// Description: 
+// Description: TESTBENCH FOR ABP_TOP
 // 
 // Dependencies: 
 // 
@@ -89,8 +89,8 @@ module apb_uart
     // TX LOGIC
     //--------------------------------------------------
 
-    logic [7:0] tx_shift_reg;
-    logic [2:0] tx_count;
+    logic [31:0] tx_shift_reg;
+    logic [5:0] tx_count;
 
     logic       tx_start;
 
@@ -98,8 +98,8 @@ module apb_uart
     // RX LOGIC
     //--------------------------------------------------
 
-    logic [7:0] rx_shift_reg;
-    logic [2:0] rx_count;
+    logic [31:0] rx_shift_reg;
+    logic [5:0] rx_count;
 
     //--------------------------------------------------
     // APB WRITE LOGIC
@@ -112,7 +112,7 @@ module apb_uart
         begin
 
             tx_reg       <= 32'h0;
-            tx_shift_reg <= 8'h00;
+            tx_shift_reg <= 32'h00;
 
             tx_start     <= 1'b0;
 
@@ -148,7 +148,7 @@ module apb_uart
                         // LOAD UART BYTE
                         //--------------------------------
 
-                        tx_shift_reg <= PWDATA[7:0];
+                        tx_shift_reg <= PWDATA[31:0];
 
                         //--------------------------------
                         // START UART TX
@@ -180,7 +180,7 @@ module apb_uart
 
             tx_state <= IDLE;
 
-            tx_count <= 3'd0;
+            tx_count <= 6'd0;
 
             status_reg[0] <= 1'b0;
 
@@ -202,7 +202,7 @@ module apb_uart
                     if(tx_start)
                     begin
 
-                        tx_count <= 3'd0;
+                        tx_count <= 6'd0;
 
                         tx_state <= START;
 
@@ -245,14 +245,14 @@ module apb_uart
                     tx_shift_reg <=
                     {
                         1'b0,
-                        tx_shift_reg[7:1]
+                        tx_shift_reg[31:1]
                     };
 
                     //----------------------------------
                     // BIT COUNT
                     //----------------------------------
 
-                    if(tx_count == 3'd7)
+                    if(tx_count == 32'd31)
                     begin
 
                         tx_state <= STOP;
@@ -304,8 +304,8 @@ module apb_uart
 
             rx_state <= IDLE;
 
-            rx_shift_reg <= 8'h00;
-            rx_count <= 3'd0;
+            rx_shift_reg <= 32'h0000_0000;
+            rx_count <= 6'd0;
 
             rx_reg <= 32'h0;
 
@@ -331,7 +331,7 @@ module apb_uart
                     if(rx == 1'b0)
                     begin
 
-                        rx_count <= 3'd0;
+                        rx_count <= 6'd0;
 
                         rx_state <= DATA;
 
@@ -353,14 +353,14 @@ module apb_uart
                     rx_shift_reg <=
                     {
                         rx,
-                        rx_shift_reg[7:1]
+                        rx_shift_reg[31:1]
                     };
 
                     //----------------------------------
                     // COUNT BITS
                     //----------------------------------
 
-                    if(rx_count == 3'd7)
+                    if(rx_count == 32'd31)
                     begin
 
                         rx_state <= STOP;
@@ -386,7 +386,7 @@ module apb_uart
                     // STORE RECEIVED BYTE
                     //----------------------------------
 
-                    rx_reg[7:0] <= rx_shift_reg;
+                    rx_reg[31:0] <= rx_shift_reg;
 
                     //----------------------------------
                     // RX VALID
