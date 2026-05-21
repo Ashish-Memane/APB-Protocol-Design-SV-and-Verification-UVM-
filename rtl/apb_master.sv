@@ -1,14 +1,15 @@
+`timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company: NA
+// Company: 
 // Engineer: Ashish Memane
 // 
-// Create Date: 19.05.2026 12:26:29
+// Create Date: 19.05.2026 12:25:36
 // Design Name: 
 // Module Name: apb_master
-// Project Name: ABP_PROTOCOL_DESIGN
+// Project Name: 
 // Target Devices: 
-// Tool Versions: VIVADO
-// Description: APB_MASTER
+// Tool Versions: 
+// Description: 
 // 
 // Dependencies: 
 // 
@@ -17,7 +18,8 @@
 // Additional Comments:
 // 
 //////////////////////////////////////////////////////////////////////////////////
-module apb_master (
+module apb_master
+(
     input logic PCLK,
     input logic PRESETn,
 
@@ -50,104 +52,145 @@ module apb_master (
     input logic        PSLVERR
 );
 
-  typedef enum logic [1:0] {
-    IDLE,
-    SETUP,
-    ACCESS
-  } state_t;
+    typedef enum logic [1:0]
+    {
+        IDLE,
+        SETUP,
+        ACCESS
+    } state_t;
 
-  state_t state;
+    state_t state;
 
-  always_ff @(posedge PCLK or negedge PRESETn) begin
+    always_ff @(posedge PCLK or negedge PRESETn)
+    begin
 
-    if (!PRESETn) begin
+        if (!PRESETn)
+        begin
 
-      PADDR   <= 0;
-      PWDATA  <= 0;
+            PADDR   <= 0;
+            PWDATA  <= 0;
 
-      PWRITE  <= 0;
-      PENABLE <= 0;
-      PSEL    <= 0;
+            PWRITE  <= 0;
+            PENABLE <= 0;
+            PSEL    <= 0;
 
-      rdata   <= 0;
-      done    <= 0;
+            rdata   <= 0;
+            done    <= 0;
 
-      state   <= IDLE;
-
-    end else begin
-
-      done <= 0;
-
-      case (state)
-
-        //------------------------------------------
-        // IDLE
-        //------------------------------------------
-
-        IDLE: begin
-
-          PSEL    <= 0;
-          PENABLE <= 0;
-
-          if (start) begin
-
-            PADDR  <= addr;
-            PWDATA <= wdata;
-
-            PWRITE <= rw;
-
-            PSEL   <= 1'b1;
-
-            state  <= SETUP;
-
-          end
+            state   <= IDLE;
 
         end
+        else
+        begin
 
-        //------------------------------------------
-        // SETUP
-        //------------------------------------------
+            done <= 0;
 
-        SETUP: begin
+            case(state)
 
-          PENABLE <= 1'b0;
+                //--------------------------------------
+                // IDLE
+                //--------------------------------------
 
-          state   <= ACCESS;
+                IDLE:
+                begin
+
+                    PSEL    <= 0;
+                    PENABLE <= 0;
+
+                    if(start)
+                    begin
+
+                        PADDR  <= addr;
+                        PWDATA <= wdata;
+
+                        PWRITE <= rw;
+
+                        PSEL   <= 1'b1;
+
+                        state  <= SETUP;
+
+                    end
+
+                end
+
+                //--------------------------------------
+                // SETUP
+                //--------------------------------------
+
+                SETUP:
+                begin
+
+                    //----------------------------------
+                    // ENABLE ACCESS PHASE
+                    //----------------------------------
+
+                    PENABLE <= 1'b1;
+
+                    state <= ACCESS;
+
+                end
+
+                //--------------------------------------
+                // ACCESS
+                //--------------------------------------
+
+                ACCESS:
+                begin
+
+                    //----------------------------------
+                    // WAIT FOR READY
+                    //----------------------------------
+
+                    if(PREADY)
+                    begin
+
+                        if(PSLVERR)
+                        begin
+
+                            $display("[APB ERROR]");
+
+                        end
+
+                        //--------------------------------
+                        // READ
+                        //--------------------------------
+
+                        if(!PWRITE)
+                        begin
+
+                            rdata <= PRDATA;
+
+                        end
+
+                        //--------------------------------
+                        // DONE
+                        //--------------------------------
+
+                        done <= 1'b1;
+
+                        //--------------------------------
+                        // DEASSERT BUS
+                        //--------------------------------
+
+                        PSEL    <= 1'b0;
+                        PENABLE <= 1'b0;
+
+                        //--------------------------------
+                        // RETURN IDLE
+                        //--------------------------------
+
+                        state <= IDLE;
+
+                    end
+
+                end
+
+            endcase
 
         end
-
-        //------------------------------------------
-        // ACCESS
-        //------------------------------------------
-
-        ACCESS: begin
-
-          PENABLE <= 1'b1;
-
-          if (PREADY) begin
-
-            if (PSLVERR) begin
-              $display("APB ERROR");
-            end
-
-            if (!PWRITE) rdata <= PRDATA;
-
-            done <= 1'b1;
-
-            PSEL <= 1'b0;
-            PENABLE <= 1'b0;
-
-            state <= IDLE;
-
-          end
-
-        end
-
-      endcase
 
     end
 
-  end
-
 endmodule
+
 
