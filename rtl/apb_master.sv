@@ -8,8 +8,8 @@
 // Module Name: apb_master
 // Project Name: 
 // Target Devices: 
-// Tool Versions: 
-// Description: 
+// Tool Versions: VIVADO
+// Description: APB_MASTER
 // 
 // Dependencies: 
 // 
