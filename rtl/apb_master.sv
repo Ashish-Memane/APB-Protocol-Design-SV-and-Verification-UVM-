@@ -8,8 +8,8 @@
 // Module Name: apb_master
 // Project Name: 
 // Target Devices: 
-// Tool Versions: VIVADO
-// Description: APB_MASTER
+// Tool Versions: 
+// Description: 
 // 
 // Dependencies: 
 // 
@@ -35,6 +35,7 @@ module apb_master
 
     output logic [31:0] rdata,
     output logic        done,
+    output logic        err,
 
     //--------------------------------------------------
     // APB BUS
@@ -67,15 +68,21 @@ module apb_master
         if (!PRESETn)
         begin
 
-            PADDR   <= 0;
-            PWDATA  <= 0;
+            //------------------------------------------
+            // RESET OUTPUTS
+            //------------------------------------------
 
-            PWRITE  <= 0;
-            PENABLE <= 0;
-            PSEL    <= 0;
+            PADDR   <= 32'h0;
+            PWDATA  <= 32'h0;
 
-            rdata   <= 0;
-            done    <= 0;
+            PWRITE  <= 1'b0;
+            PENABLE <= 1'b0;
+            PSEL    <= 1'b0;
+
+            rdata   <= 32'h0;
+
+            done    <= 1'b0;
+            err     <= 1'b0;
 
             state   <= IDLE;
 
@@ -83,7 +90,12 @@ module apb_master
         else
         begin
 
-            done <= 0;
+            //------------------------------------------
+            // DEFAULTS
+            //------------------------------------------
+
+            done <= 1'b0;
+            err  <= 1'b0;
 
             case(state)
 
@@ -94,20 +106,28 @@ module apb_master
                 IDLE:
                 begin
 
-                    PSEL    <= 0;
-                    PENABLE <= 0;
+                    PSEL    <= 1'b0;
+                    PENABLE <= 1'b0;
 
                     if(start)
                     begin
+
+                        //----------------------------------
+                        // LOAD APB SIGNALS
+                        //----------------------------------
 
                         PADDR  <= addr;
                         PWDATA <= wdata;
 
                         PWRITE <= rw;
 
-                        PSEL   <= 1'b1;
+                        //----------------------------------
+                        // START SETUP PHASE
+                        //----------------------------------
 
-                        state  <= SETUP;
+                        PSEL <= 1'b1;
+
+                        state <= SETUP;
 
                     end
 
@@ -121,7 +141,7 @@ module apb_master
                 begin
 
                     //----------------------------------
-                    // ENABLE ACCESS PHASE
+                    // ACCESS PHASE
                     //----------------------------------
 
                     PENABLE <= 1'b1;
@@ -138,22 +158,25 @@ module apb_master
                 begin
 
                     //----------------------------------
-                    // WAIT FOR READY
+                    // WAIT FOR SLAVE READY
                     //----------------------------------
 
                     if(PREADY)
                     begin
 
+                        //----------------------------------
+                        // CAPTURE ERROR
+                        //----------------------------------
+
                         if(PSLVERR)
                         begin
 
-                            $display("[APB ERROR]");
-
+                            err <= 1'b1;
                         end
 
-                        //--------------------------------
-                        // READ
-                        //--------------------------------
+                        //----------------------------------
+                        // READ OPERATION
+                        //----------------------------------
 
                         if(!PWRITE)
                         begin
@@ -162,22 +185,22 @@ module apb_master
 
                         end
 
-                        //--------------------------------
-                        // DONE
-                        //--------------------------------
+                        //----------------------------------
+                        // TRANSACTION COMPLETE
+                        //----------------------------------
 
                         done <= 1'b1;
 
-                        //--------------------------------
+                        //----------------------------------
                         // DEASSERT BUS
-                        //--------------------------------
+                        //----------------------------------
 
                         PSEL    <= 1'b0;
                         PENABLE <= 1'b0;
 
-                        //--------------------------------
-                        // RETURN IDLE
-                        //--------------------------------
+                        //----------------------------------
+                        // RETURN TO IDLE
+                        //----------------------------------
 
                         state <= IDLE;
 
