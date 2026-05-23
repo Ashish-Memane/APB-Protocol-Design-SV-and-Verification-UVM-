@@ -37,7 +37,8 @@ module apb_top (
 
     // External Outputs
     output logic [31:0] rdata,
-    output logic        done
+    output logic        done,
+    output logic        err
 
 );
   //==================================================
@@ -85,6 +86,7 @@ module apb_top (
       .wdata(wdata),
       .rdata(rdata),
       .done (done),
+      .err(err),  
 
       .PADDR  (PADDR),
       .PWDATA (PWDATA),
