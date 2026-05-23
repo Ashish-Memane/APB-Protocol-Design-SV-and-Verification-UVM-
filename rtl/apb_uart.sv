@@ -40,7 +40,7 @@ module apb_uart
     output logic        PSLVERR,
 
     //--------------------------------------------------
-    // UART INTERFACE
+    // UART
     //--------------------------------------------------
 
     output logic tx,
@@ -48,7 +48,7 @@ module apb_uart
 );
 
     //--------------------------------------------------
-    // REGISTER MAP
+    // ADDRESS MAP
     //--------------------------------------------------
 
     localparam TXDATA_ADDR = 32'h0000_0000;
@@ -56,7 +56,7 @@ module apb_uart
     localparam STATUS_ADDR = 32'h0000_0008;
 
     //--------------------------------------------------
-    // INTERNAL REGISTERS
+    // REGISTERS
     //--------------------------------------------------
 
     logic [31:0] tx_reg;
@@ -64,14 +64,14 @@ module apb_uart
     logic [31:0] status_reg;
 
     //--------------------------------------------------
-    // STATUS REGISTER
+    // STATUS
     //--------------------------------------------------
-    // status_reg[0] -> tx_busy
-    // status_reg[1] -> rx_valid
+    // status_reg[0] = tx_busy
+    // status_reg[1] = rx_valid
     //--------------------------------------------------
 
     //--------------------------------------------------
-    // UART STATES
+    // UART TX FSM
     //--------------------------------------------------
 
     typedef enum logic [1:0]
@@ -83,26 +83,21 @@ module apb_uart
     } uart_state_t;
 
     uart_state_t tx_state;
-    uart_state_t rx_state;
 
     //--------------------------------------------------
     // TX LOGIC
     //--------------------------------------------------
 
-    logic [31:0] tx_shift_reg;
-    logic [5:0] tx_count;
+    logic [31:0] tx_shift_32;
+    logic [7:0]  tx_shift_8;
 
-    logic       tx_start;
+    logic [2:0]  bit_count;
+    logic [1:0]  byte_count;
 
-    //--------------------------------------------------
-    // RX LOGIC
-    //--------------------------------------------------
-
-    logic [31:0] rx_shift_reg;
-    logic [5:0] rx_count;
+    logic        tx_start;
 
     //--------------------------------------------------
-    // APB WRITE LOGIC
+    // APB WRITE
     //--------------------------------------------------
 
     always_ff @(posedge PCLK or negedge PRESETn)
@@ -111,10 +106,8 @@ module apb_uart
         if(!PRESETn)
         begin
 
-            tx_reg       <= 32'h0;
-            tx_shift_reg <= 32'h00;
-
-            tx_start     <= 1'b0;
+            tx_reg   <= 32'h0;
+            tx_start <= 1'b0;
 
         end
         else
@@ -122,38 +115,15 @@ module apb_uart
 
             tx_start <= 1'b0;
 
-            //------------------------------------------
-            // VALID APB WRITE
-            //------------------------------------------
-
             if(PSEL && PENABLE && PWRITE)
             begin
 
                 case(PADDR)
 
-                    //----------------------------------
-                    // TXDATA REGISTER
-                    //----------------------------------
-
                     TXDATA_ADDR:
                     begin
 
-                        //--------------------------------
-                        // STORE APB DATA
-                        //--------------------------------
-
-                        tx_reg <= PWDATA;
-
-                        //--------------------------------
-                        // LOAD UART BYTE
-                        //--------------------------------
-
-                        tx_shift_reg <= PWDATA[31:0];
-
-                        //--------------------------------
-                        // START UART TX
-                        //--------------------------------
-
+                        tx_reg   <= PWDATA;
                         tx_start <= 1'b1;
 
                     end
@@ -180,7 +150,11 @@ module apb_uart
 
             tx_state <= IDLE;
 
-            tx_count <= 6'd0;
+            tx_shift_32 <= 32'h0;
+            tx_shift_8  <= 8'h00;
+
+            bit_count  <= 3'd0;
+            byte_count <= 2'd0;
 
             status_reg[0] <= 1'b0;
 
@@ -202,11 +176,36 @@ module apb_uart
                     if(tx_start)
                     begin
 
-                        tx_count <= 6'd0;
+                        //----------------------------------
+                        // LOAD 32-BIT DATA
+                        //----------------------------------
 
-                        tx_state <= START;
+                        tx_shift_32 <= tx_reg;
+
+                        //----------------------------------
+                        // LOAD FIRST BYTE
+                        //----------------------------------
+
+                        tx_shift_8 <= tx_reg[7:0];
+
+                        //----------------------------------
+                        // RESET COUNTERS
+                        //----------------------------------
+
+                        bit_count  <= 3'd0;
+                        byte_count <= 2'd0;
+
+                        //----------------------------------
+                        // BUSY
+                        //----------------------------------
 
                         status_reg[0] <= 1'b1;
+
+                        //----------------------------------
+                        // START TX
+                        //----------------------------------
+
+                        tx_state <= START;
 
                     end
 
@@ -226,34 +225,36 @@ module apb_uart
                 end
 
                 //--------------------------------------
-                // DATA BITS
+                // SEND 8 DATA BITS
                 //--------------------------------------
 
                 DATA:
                 begin
 
                     //----------------------------------
-                    // UART SENDS LSB FIRST
+                    // SEND LSB FIRST
                     //----------------------------------
 
-                    tx <= tx_shift_reg[0];
+                    tx <= tx_shift_8[0];
 
                     //----------------------------------
                     // SHIFT RIGHT
                     //----------------------------------
 
-                    tx_shift_reg <=
+                    tx_shift_8 <=
                     {
                         1'b0,
-                        tx_shift_reg[31:1]
+                        tx_shift_8[7:1]
                     };
 
                     //----------------------------------
-                    // BIT COUNT
+                    // BIT COUNTER
                     //----------------------------------
 
-                    if(tx_count == 32'd31)
+                    if(bit_count == 3'd7)
                     begin
+
+                        bit_count <= 3'd0;
 
                         tx_state <= STOP;
 
@@ -261,7 +262,7 @@ module apb_uart
                     else
                     begin
 
-                        tx_count <= tx_count + 1'b1;
+                        bit_count <= bit_count + 1'b1;
 
                     end
 
@@ -276,13 +277,54 @@ module apb_uart
 
                     tx <= 1'b1;
 
-                    tx_state <= IDLE;
-
                     //----------------------------------
-                    // CLEAR BUSY
+                    // ALL 4 BYTES SENT?
                     //----------------------------------
 
-                    status_reg[0] <= 1'b0;
+                    if(byte_count == 2'd3)
+                    begin
+
+                        //--------------------------------
+                        // DONE
+                        //--------------------------------
+
+                        status_reg[0] <= 1'b0;
+
+                        tx_state <= IDLE;
+
+                    end
+                    else
+                    begin
+
+                        //--------------------------------
+                        // NEXT BYTE
+                        //--------------------------------
+
+                        byte_count <= byte_count + 1'b1;
+
+                        //--------------------------------
+                        // SHIFT 32-BIT REGISTER
+                        //--------------------------------
+
+                        tx_shift_32 <=
+                        {
+                            8'h00,
+                            tx_shift_32[31:8]
+                        };
+
+                        //--------------------------------
+                        // LOAD NEXT BYTE
+                        //--------------------------------
+
+                        tx_shift_8 <= tx_shift_32[15:8];
+
+                        //--------------------------------
+                        // NEXT FRAME
+                        //--------------------------------
+
+                        tx_state <= START;
+
+                    end
 
                 end
 
@@ -293,7 +335,7 @@ module apb_uart
     end
 
     //--------------------------------------------------
-    // UART RX FSM
+    // SIMPLE RX LOOPBACK PLACEHOLDER
     //--------------------------------------------------
 
     always_ff @(posedge PCLK or negedge PRESETn)
@@ -301,11 +343,6 @@ module apb_uart
 
         if(!PRESETn)
         begin
-
-            rx_state <= IDLE;
-
-            rx_shift_reg <= 32'h0000_0000;
-            rx_count <= 6'd0;
 
             rx_reg <= 32'h0;
 
@@ -315,133 +352,37 @@ module apb_uart
         else
         begin
 
-            case(rx_state)
+            status_reg[1] <= 1'b0;
 
-                //--------------------------------------
-                // IDLE
-                //--------------------------------------
-
-                IDLE:
-                begin
-
-                    //----------------------------------
-                    // DETECT START BIT
-                    //----------------------------------
-
-                    if(rx == 1'b0)
-                    begin
-
-                        rx_count <= 6'd0;
-
-                        rx_state <= DATA;
-
-                    end
-
-                end
-
-                //--------------------------------------
-                // RECEIVE DATA
-                //--------------------------------------
-
-                DATA:
-                begin
-
-                    //----------------------------------
-                    // RECEIVE LSB FIRST
-                    //----------------------------------
-
-                    rx_shift_reg <=
-                    {
-                        rx,
-                        rx_shift_reg[31:1]
-                    };
-
-                    //----------------------------------
-                    // COUNT BITS
-                    //----------------------------------
-
-                    if(rx_count == 32'd31)
-                    begin
-
-                        rx_state <= STOP;
-
-                    end
-                    else
-                    begin
-
-                        rx_count <= rx_count + 1'b1;
-
-                    end
-
-                end
-
-                //--------------------------------------
-                // STOP BIT
-                //--------------------------------------
-
-                STOP:
-                begin
-
-                    //----------------------------------
-                    // STORE RECEIVED BYTE
-                    //----------------------------------
-
-                    rx_reg[31:0] <= rx_shift_reg;
-
-                    //----------------------------------
-                    // RX VALID
-                    //----------------------------------
-
-                    status_reg[1] <= 1'b1;
-
-                    rx_state <= IDLE;
-
-                end
-
-            endcase
+            // Placeholder RX logic
+            // Can be upgraded later
 
         end
 
     end
 
     //--------------------------------------------------
-    // APB READ LOGIC
+    // APB READ
     //--------------------------------------------------
 
     always_comb
     begin
 
-        PRDATA = 32'h00000000;
+        PRDATA = 32'h0;
 
         if(PSEL && !PWRITE)
         begin
 
             case(PADDR)
 
-                //--------------------------------------
-                // TXDATA
-                //--------------------------------------
-
                 TXDATA_ADDR:
                     PRDATA = tx_reg;
-
-                //--------------------------------------
-                // RXDATA
-                //--------------------------------------
 
                 RXDATA_ADDR:
                     PRDATA = rx_reg;
 
-                //--------------------------------------
-                // STATUS
-                //--------------------------------------
-
                 STATUS_ADDR:
                     PRDATA = status_reg;
-
-                //--------------------------------------
-                // INVALID ADDRESS
-                //--------------------------------------
 
                 default:
                     PRDATA = 32'hDEADBEEF;
@@ -475,18 +416,10 @@ module apb_uart
                 TXDATA_ADDR,
                 RXDATA_ADDR,
                 STATUS_ADDR:
-                begin
-
                     PSLVERR = 1'b0;
 
-                end
-
                 default:
-                begin
-
                     PSLVERR = 1'b1;
-
-                end
 
             endcase
 
