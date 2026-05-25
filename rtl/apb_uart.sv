@@ -44,7 +44,7 @@ module apb_uart
     //--------------------------------------------------
 
     output logic tx,
-    input  logic rx
+    input logic rx
 );
 
     //--------------------------------------------------
@@ -95,7 +95,19 @@ module apb_uart
     logic [1:0]  byte_count;
 
     logic        tx_start;
-
+    
+    //--------------------------------------------------
+    // RX LOGIC
+    //--------------------------------------------------
+    
+    logic [31:0] rx_shift_32;
+    logic [7:0]  rx_shift_8;
+    
+    logic [2:0]  rx_bit_count;
+    logic [1:0]  rx_byte_count;
+    
+    uart_state_t rx_state;
+    
     //--------------------------------------------------
     // APB WRITE
     //--------------------------------------------------
@@ -334,31 +346,170 @@ module apb_uart
 
     end
 
+   //--------------------------------------------------
+    // UART RX FSM
     //--------------------------------------------------
-    // SIMPLE RX LOOPBACK PLACEHOLDER
-    //--------------------------------------------------
-
+    
     always_ff @(posedge PCLK or negedge PRESETn)
     begin
-
+    
         if(!PRESETn)
         begin
-
+    
+            //rx <= 1'b1;
+    
+            rx_state <= IDLE;
+    
+            rx_shift_32 <= 32'h0;
+            rx_shift_8  <= 8'h00;
+    
+            rx_bit_count  <= 3'd0;
+            rx_byte_count <= 2'd0;
+    
             rx_reg <= 32'h0;
-
+    
             status_reg[1] <= 1'b0;
-
+    
         end
         else
         begin
-
+    
+            //------------------------------------------
+            // CLEAR RX VALID AFTER ONE CYCLE
+            //------------------------------------------
+    
             status_reg[1] <= 1'b0;
-
-            // Placeholder RX logic
-            // Can be upgraded later
-
+    
+            case(rx_state)
+    
+                //--------------------------------------
+                // IDLE
+                //--------------------------------------
+    
+                IDLE:
+                begin
+    
+                    //----------------------------------
+                    // DETECT START BIT
+                    //----------------------------------
+    
+                    if(rx == 1'b0)
+                    begin
+    
+                        rx_bit_count <= 3'd0;
+    
+                        rx_shift_8 <= 8'h00;
+    
+                        rx_state <= DATA;
+    
+                    end
+    
+                end
+    
+                //--------------------------------------
+                // RECEIVE 8 DATA BITS
+                //--------------------------------------
+    
+                DATA:
+                begin
+    
+                    //----------------------------------
+                    // SHIFT IN SERIAL DATA
+                    //----------------------------------
+    
+                    rx_shift_8 <=
+                    {
+                        rx,
+                        rx_shift_8[7:1]
+                    };
+    
+                    //----------------------------------
+                    // BIT COUNTER
+                    //----------------------------------
+    
+                    if(rx_bit_count == 3'd7)
+                    begin
+    
+                        rx_bit_count <= 3'd0;
+    
+                        rx_state <= STOP;
+    
+                    end
+                    else
+                    begin
+    
+                        rx_bit_count <= rx_bit_count + 1'b1;
+    
+                    end
+    
+                end
+    
+                //--------------------------------------
+                // STOP BIT
+                //--------------------------------------
+    
+                STOP:
+                begin
+    
+                    //----------------------------------
+                    // STORE BYTE INTO 32-BIT REGISTER
+                    //----------------------------------
+    
+                    rx_shift_32 <=
+                    {
+                        rx_shift_8,
+                        rx_shift_32[31:8]
+                    };
+    
+                    //----------------------------------
+                    // ALL 4 BYTES RECEIVED?
+                    //----------------------------------
+    
+                    if(rx_byte_count == 2'd3)
+                    begin
+    
+                        //--------------------------------
+                        // STORE FINAL RX DATA
+                        //--------------------------------
+    
+                        rx_reg <=
+                        {
+                            rx_shift_8,
+                            rx_shift_32[31:8]
+                        };
+    
+                        //--------------------------------
+                        // RX VALID
+                        //--------------------------------
+    
+                        status_reg[1] <= 1'b1;
+    
+                        //--------------------------------
+                        // RESET BYTE COUNT
+                        //--------------------------------
+    
+                        rx_byte_count <= 2'd0;
+    
+                    end
+                    else
+                    begin
+    
+                        rx_byte_count <= rx_byte_count + 1'b1;
+    
+                    end
+    
+                    //----------------------------------
+                    // RETURN TO IDLE
+                    //----------------------------------
+    
+                    rx_state <= IDLE;
+    
+                end
+    
+            endcase
+    
         end
-
+    
     end
 
     //--------------------------------------------------
