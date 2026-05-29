@@ -100,6 +100,18 @@ module apb_spi
     logic [5:0] bit_count;
 
     //==================================================
+    // APB HANDSHAKE
+    //==================================================
+
+    logic apb_write;
+
+    assign apb_write =
+            PSEL    &&
+            PENABLE &&
+            PWRITE  &&
+            PREADY;
+
+    //==================================================
     // MAIN LOGIC
     //==================================================
 
@@ -109,49 +121,58 @@ module apb_spi
         if(!PRESETn)
         begin
 
-            tx_reg       <= 32'h0;
-            rx_reg       <= 32'h0;
+            //------------------------------------------
+            // REGISTERS
+            //------------------------------------------
 
-            status_reg   <= 32'h0;
-            control_reg  <= 32'h0;
+            tx_reg      <= 32'h0;
+            rx_reg      <= 32'h0;
+
+            status_reg  <= 32'h0;
+            control_reg <= 32'h0;
+
+            //------------------------------------------
+            // SHIFT REGISTERS
+            //------------------------------------------
 
             tx_shift_reg <= 32'h0;
             rx_shift_reg <= 32'h0;
 
-            bit_count    <= 6'd0;
+            //------------------------------------------
+            // COUNTER
+            //------------------------------------------
 
-            spi_state    <= IDLE;
+            bit_count <= 6'd0;
 
-            sclk         <= 1'b0;
-            mosi         <= 1'b0;
-            cs           <= 1'b1;
+            //------------------------------------------
+            // FSM
+            //------------------------------------------
+
+            spi_state <= IDLE;
+
+            //------------------------------------------
+            // SPI SIGNALS
+            //------------------------------------------
+
+            sclk <= 1'b0;
+            mosi <= 1'b0;
+            cs   <= 1'b1;
 
         end
         else
         begin
 
             //------------------------------------------
-            // CLEAR TRANSFER_DONE ON NEW START
-            //------------------------------------------
-
-            if(control_reg[0])
-            begin
-
-                status_reg[1] <= 1'b0;
-
-            end
-
-            //------------------------------------------
             // APB WRITE
             //------------------------------------------
 
-            if(PSEL && PENABLE && PWRITE)
+            if(apb_write)
             begin
 
                 case(PADDR)
 
                     //----------------------------------
-                    // TX DATA
+                    // TX DATA REGISTER
                     //----------------------------------
 
                     TXDATA_ADDR:
@@ -162,27 +183,26 @@ module apb_spi
                     end
 
                     //----------------------------------
-                    // CONTROL
+                    // CONTROL REGISTER
                     //----------------------------------
 
                     CONTROL_ADDR:
                     begin
 
+                        control_reg <= PWDATA;
+
                         //----------------------------------
-                        // START ONLY IF NOT BUSY
+                        // START TRANSFER
                         //----------------------------------
 
-                        if(PWDATA[0] && !status_reg[0])
+                        if(PWDATA[0] && (spi_state == IDLE))
                         begin
-
-                            control_reg <= PWDATA;
 
                             //----------------------------------
                             // LOAD SHIFT REGISTERS
                             //----------------------------------
 
                             tx_shift_reg <= tx_reg;
-
                             rx_shift_reg <= 32'h0;
 
                             //----------------------------------
@@ -192,10 +212,11 @@ module apb_spi
                             bit_count <= 6'd0;
 
                             //----------------------------------
-                            // BUSY
+                            // STATUS
                             //----------------------------------
 
                             status_reg[0] <= 1'b1;
+                            status_reg[1] <= 1'b0;
 
                             //----------------------------------
                             // START FSM
@@ -205,6 +226,11 @@ module apb_spi
 
                         end
 
+                    end
+
+                    default:
+                    begin
+                        // DO NOTHING
                     end
 
                 endcase
@@ -237,10 +263,14 @@ module apb_spi
                 begin
 
                     //----------------------------------
-                    // ASSERT CS
+                    // ASSERT CHIP SELECT
                     //----------------------------------
 
                     cs <= 1'b0;
+
+                    //----------------------------------
+                    // MOVE TO TRANSFER
+                    //----------------------------------
 
                     spi_state <= TRANSFER;
 
@@ -293,7 +323,7 @@ module apb_spi
                         };
 
                         //----------------------------------
-                        // COUNT BITS
+                        // BIT COUNT
                         //----------------------------------
 
                         if(bit_count == 6'd31)
@@ -321,7 +351,7 @@ module apb_spi
                 begin
 
                     //----------------------------------
-                    // DEASSERT CS
+                    // DEASSERT CHIP SELECT
                     //----------------------------------
 
                     cs <= 1'b1;
@@ -343,7 +373,6 @@ module apb_spi
                     //----------------------------------
 
                     status_reg[0] <= 1'b0;
-
                     status_reg[1] <= 1'b1;
 
                     //----------------------------------
@@ -418,9 +447,8 @@ module apb_spi
         // STALL DURING SPI TRANSFER
         //----------------------------------------------
 
-        if(PSEL &&
-           PENABLE &&
-           (spi_state != IDLE))
+        if((spi_state == START) ||
+           (spi_state == TRANSFER))
         begin
 
             PREADY = 1'b0;
@@ -459,4 +487,3 @@ module apb_spi
     end
 
 endmodule
-
