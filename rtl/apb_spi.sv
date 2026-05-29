@@ -103,7 +103,8 @@ module apb_spi
     // MAIN LOGIC
     //==================================================
 
-    always @(posedge PCLK or negedge PRESETn) begin
+    always_ff @(posedge PCLK or negedge PRESETn)
+    begin
 
         if(!PRESETn)
         begin
