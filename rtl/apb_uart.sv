@@ -579,4 +579,3 @@ module apb_uart
     end
 
 endmodule
-
