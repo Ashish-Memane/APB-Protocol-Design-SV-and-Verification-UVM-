@@ -1,14 +1,15 @@
+`timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company: NA
-// Engineer: Ashish Memane
+// Company: 
+// Engineer: 
 // 
-// Create Date: 19.05.2026 12:26:29
+// Create Date: 18.05.2026 17:39:56
 // Design Name: 
 // Module Name: apb_gpio
-// Project Name: ABP_PROTOCOL_DESIGN
+// Project Name: 
 // Target Devices: 
-// Tool Versions: VIVADO
-// Description: APB_GPIO
+// Tool Versions: 
+// Description: 
 // 
 // Dependencies: 
 // 
@@ -18,11 +19,11 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-module apb_gpio (
-
-    //==================================================
-    // APB INTERFACE SIGNALS
-    //==================================================
+module apb_gpio
+(
+    //--------------------------------------------------
+    // APB INTERFACE
+    //--------------------------------------------------
 
     input  logic        PCLK,
     input  logic        PRESETn,
@@ -38,81 +39,175 @@ module apb_gpio (
     output logic        PREADY,
     output logic        PSLVERR,
 
-    //==================================================
-    // GPIO INTERFACE SIGNALS
-    //==================================================
+    //--------------------------------------------------
+    // GPIO INTERFACE
+    //--------------------------------------------------
 
     input  logic [31:0] gpio_in,
     output logic [31:0] gpio_out,
     output logic [31:0] gpio_dir
-
 );
 
-    //==================================================
-    // INTERNAL REGISTERS
-    //==================================================
-
-    logic [31:0] gpio_out_reg;
-    logic [31:0] gpio_dir_reg;
-
-    //==================================================
+    //--------------------------------------------------
     // ADDRESS MAP
-    //==================================================
-    //
-    // 0x00 : GPIO_OUT
-    // 0x04 : GPIO_IN
-    // 0x08 : GPIO_DIR
-    //
-    //==================================================
+    //--------------------------------------------------
 
     localparam GPIO_OUT_ADDR = 32'h0000_0000;
     localparam GPIO_IN_ADDR  = 32'h0000_0004;
     localparam GPIO_DIR_ADDR = 32'h0000_0008;
+    localparam STATUS_ADDR   = 32'h0000_000C;
 
-    //==================================================
-    // APB WRITE OPERATION
-    //==================================================
+    //--------------------------------------------------
+    // INTERNAL REGISTERS
+    //--------------------------------------------------
+
+    logic [31:0] gpio_out_reg;
+    logic [31:0] gpio_dir_reg;
+    logic [31:0] status_reg;
+
+    //--------------------------------------------------
+    // STATUS BITS
+    //--------------------------------------------------
+    // status_reg[0] = busy
+    //--------------------------------------------------
+
+    //--------------------------------------------------
+    // GPIO FSM
+    //--------------------------------------------------
+
+    typedef enum logic [1:0]
+    {
+        IDLE,
+        BUSY
+    } gpio_state_t;
+
+    gpio_state_t state;
+
+    //--------------------------------------------------
+    // DELAY COUNTER
+    //--------------------------------------------------
+
+    logic [1:0] delay_cnt;
+
+    //--------------------------------------------------
+    // APB WRITE + GPIO FSM
+    //--------------------------------------------------
 
     always_ff @(posedge PCLK or negedge PRESETn)
     begin
 
-        if (!PRESETn)
+        if(!PRESETn)
         begin
 
-            gpio_out_reg <= 32'h0000_0000;
-            gpio_dir_reg <= 32'h0000_0000;
+            gpio_out_reg <= 32'h0;
+            gpio_dir_reg <= 32'h0;
+
+            status_reg   <= 32'h0;
+
+            delay_cnt    <= 2'd0;
+
+            state        <= IDLE;
 
         end
-        else if (PSEL && PENABLE && PWRITE)
+        else
         begin
 
-            case (PADDR)
+            case(state)
 
-                //------------------------------------------
-                // GPIO OUTPUT REGISTER
-                //------------------------------------------
+                //--------------------------------------
+                // IDLE
+                //--------------------------------------
 
-                GPIO_OUT_ADDR:
+                IDLE:
                 begin
 
-                    gpio_out_reg <= PWDATA;
+                    status_reg[0] <= 1'b0;
+
+                    //----------------------------------
+                    // APB WRITE
+                    //----------------------------------
+
+                    if(PSEL && PENABLE && PWRITE)
+                    begin
+
+                        case(PADDR)
+
+                            //----------------------------------
+                            // GPIO OUTPUT
+                            //----------------------------------
+
+                            GPIO_OUT_ADDR:
+                            begin
+
+                                gpio_out_reg <= PWDATA;
+
+                                //--------------------------------
+                                // START BUSY
+                                //--------------------------------
+
+                                status_reg[0] <= 1'b1;
+
+                                delay_cnt <= 2'd2;
+
+                                state <= BUSY;
+
+                            end
+
+                            //----------------------------------
+                            // GPIO DIRECTION
+                            //----------------------------------
+
+                            GPIO_DIR_ADDR:
+                            begin
+
+                                gpio_dir_reg <= PWDATA;
+
+                                //--------------------------------
+                                // START BUSY
+                                //--------------------------------
+
+                                status_reg[0] <= 1'b1;
+
+                                delay_cnt <= 2'd2;
+
+                                state <= BUSY;
+
+                            end
+
+                        endcase
+
+                    end
 
                 end
 
-                //------------------------------------------
-                // GPIO DIRECTION REGISTER
-                //------------------------------------------
+                //--------------------------------------
+                // BUSY
+                //--------------------------------------
 
-                GPIO_DIR_ADDR:
+                BUSY:
                 begin
 
-                    gpio_dir_reg <= PWDATA;
+                    status_reg[0] <= 1'b1;
 
-                end
+                    //----------------------------------
+                    // DELAY
+                    //----------------------------------
 
-                default:
-                begin
-                    // DO NOTHING
+                    if(delay_cnt == 0)
+                    begin
+
+                        status_reg[0] <= 1'b0;
+
+                        state <= IDLE;
+
+                    end
+                    else
+                    begin
+
+                        delay_cnt <= delay_cnt - 1'b1;
+
+                    end
+
                 end
 
             endcase
@@ -121,71 +216,34 @@ module apb_gpio (
 
     end
 
-    //==================================================
-    // APB READ OPERATION
-    //==================================================
+    //--------------------------------------------------
+    // APB READ
+    //--------------------------------------------------
 
     always_comb
     begin
 
-        //----------------------------------------------
-        // DEFAULT
-        //----------------------------------------------
+        PRDATA = 32'h0;
 
-        PRDATA = 32'h0000_0000;
-
-        //----------------------------------------------
-        // APB READ
-        //----------------------------------------------
-
-        if (PSEL && !PWRITE)
+        if(PSEL && !PWRITE)
         begin
 
-            case (PADDR)
-
-                //------------------------------------------
-                // GPIO OUTPUT REGISTER
-                //------------------------------------------
+            case(PADDR)
 
                 GPIO_OUT_ADDR:
-                begin
-
                     PRDATA = gpio_out_reg;
 
-                end
-
-                //------------------------------------------
-                // GPIO INPUT REGISTER
-                //------------------------------------------
-
                 GPIO_IN_ADDR:
-                begin
-
                     PRDATA = gpio_in;
 
-                end
-
-                //------------------------------------------
-                // GPIO DIRECTION REGISTER
-                //------------------------------------------
-
                 GPIO_DIR_ADDR:
-                begin
-
                     PRDATA = gpio_dir_reg;
 
-                end
-
-                //------------------------------------------
-                // INVALID ADDRESS
-                //------------------------------------------
+                STATUS_ADDR:
+                    PRDATA = status_reg;
 
                 default:
-                begin
-
                     PRDATA = 32'hDEADBEEF;
-
-                end
 
             endcase
 
@@ -193,54 +251,62 @@ module apb_gpio (
 
     end
 
-    //==================================================
-    // GPIO OUTPUT ASSIGNMENTS
-    //==================================================
+    //--------------------------------------------------
+    // APB READY
+    //--------------------------------------------------
 
-    assign gpio_out = gpio_out_reg;
+    always_comb
+    begin
 
-    assign gpio_dir = gpio_dir_reg;
+        PREADY = 1'b1;
 
-    //==================================================
-    // APB READY SIGNAL
-    //==================================================
+        //----------------------------------------------
+        // STALL APB DURING GPIO BUSY
+        //----------------------------------------------
 
-    assign PREADY = 1'b1;
+        if(PSEL && PENABLE && status_reg[0])
+        begin
 
-    //==================================================
-    // APB ERROR SIGNAL
-    //==================================================
+            PREADY = 1'b0;
+
+        end
+
+    end
+
+    //--------------------------------------------------
+    // APB ERROR
+    //--------------------------------------------------
 
     always_comb
     begin
 
         PSLVERR = 1'b0;
 
-        if (PSEL && PENABLE)
+        if(PSEL && PENABLE)
         begin
 
-            case (PADDR)
+            case(PADDR)
 
                 GPIO_OUT_ADDR,
                 GPIO_IN_ADDR,
-                GPIO_DIR_ADDR:
-                begin
-
+                GPIO_DIR_ADDR,
+                STATUS_ADDR:
                     PSLVERR = 1'b0;
 
-                end
-
                 default:
-                begin
-
                     PSLVERR = 1'b1;
-
-                end
 
             endcase
 
         end
 
     end
+
+    //--------------------------------------------------
+    // OUTPUT ASSIGNMENTS
+    //--------------------------------------------------
+
+    assign gpio_out = gpio_out_reg;
+    assign gpio_dir = gpio_dir_reg;
 
 endmodule
