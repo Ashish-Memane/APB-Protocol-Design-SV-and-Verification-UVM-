@@ -1,3 +1,22 @@
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: Ashish Memane
+// 
+// Create Date: 18.05.2026 17:39:56
+// Design Name: spi interface
+// Module Name: spi_interface
+// Project Name: 
+// Target Devices: 
+// Tool Versions: 
+// Description: 
+// 
+// Dependencies: 
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
 // spi interface
 interface spi_interface(input logic PCLK, input logic PRESETn);
 
