@@ -41,150 +41,121 @@ module apb_spi
     output logic        cs
 );
 
-localparam SPI_ADDR = 32'h0000_0000;
+    // local_addr from apb_top maps SPI_TXDATA_ADDR (32'h0002_0000) down to zero
+    localparam SPI_ADDR = 32'h0000_0000;
 
-logic [31:0] tx_reg;
-logic [31:0] rx_reg;
+    logic [31:0] tx_reg;
+    logic [31:0] rx_reg;
 
-logic [31:0] tx_shift;
-logic [31:0] rx_shift;
+    logic [31:0] tx_shift;
+    logic [31:0] rx_shift;
 
-logic [5:0] bit_cnt;
+    logic [5:0]  bit_cnt;
 
-typedef enum logic [1:0]
-{
-    IDLE,
-    TRANSFER,
-    DONE
-} spi_state_t;
+    typedef enum logic [1:0]
+    {
+        IDLE,
+        TRANSFER,
+        DONE
+    } spi_state_t;
 
-spi_state_t state;
+    spi_state_t state;
 
-always_ff @(posedge PCLK or negedge PRESETn)
-begin
-    if(!PRESETn)
+    //=====================================================
+    // SPI ENGINE & APB REGISTER WRITE
+    //=====================================================
+    always_ff @(posedge PCLK or negedge PRESETn)
     begin
-        tx_reg   <= 0;
-        rx_reg   <= 0;
-
-        tx_shift <= 0;
-        rx_shift <= 0;
-
-        bit_cnt  <= 0;
-
-        state    <= IDLE;
-
-        sclk     <= 0;
-        mosi     <= 0;
-        cs       <= 1;
-    end
-    else
-    begin
-
-        //----------------------------------
-        // APB WRITE = START SPI
-        //----------------------------------
-        if(PSEL && PENABLE && PWRITE &&
-           PADDR == SPI_ADDR &&
-           state == IDLE)
+        if(!PRESETn)
         begin
-
-            tx_reg   <= PWDATA;
-
-            tx_shift <= PWDATA;
-            rx_shift <= 0;
-
-            bit_cnt  <= 0;
-
-            cs       <= 0;
-
-            state    <= TRANSFER;
-
+            tx_reg   <= 32'h0;
+            rx_reg   <= 32'h0;
+            tx_shift <= 32'h0;
+            rx_shift <= 32'h0;
+            bit_cnt  <= 6'd0;
+            state    <= IDLE;
+            sclk     <= 1'b0;
+            mosi     <= 1'b0;
+            cs       <= 1'b1;
         end
+        else
+        begin
+            case(state)
 
-        //----------------------------------
-        // SPI FSM
-        //----------------------------------
-        case(state)
-
-            IDLE:
-            begin
-                sclk <= 0;
-                cs   <= 1;
-            end
-
-            TRANSFER:
-            begin
-
-                sclk <= ~sclk;
-
-                if(sclk == 0)
+                IDLE:
                 begin
+                    sclk <= 1'b0;
+                    cs   <= 1'b1;
 
-                    mosi <= tx_shift[31];
-
-                    tx_shift <=
-                    {
-                        tx_shift[30:0],
-                        1'b0
-                    };
-
-                    rx_shift <=
-                    {
-                        rx_shift[30:0],
-                        miso
-                    };
-
-                    if(bit_cnt == 31)
-                        state <= DONE;
-                    else
-                        bit_cnt <= bit_cnt + 1;
-
+                    // Trigger the SPI engine only on a valid write setup/access phase
+                    if(PSEL && PENABLE && PWRITE && (PADDR == SPI_ADDR)) 
+                    begin
+                        tx_reg   <= PWDATA;
+                        tx_shift <= PWDATA;
+                        rx_shift <= 32'h0;
+                        bit_cnt  <= 6'd0;
+                        cs       <= 1'b0; // Drop chip-select to start physical transfer
+                        state    <= TRANSFER;
+                    end
                 end
 
-            end
+                TRANSFER:
+                begin
+                    sclk <= ~sclk; // Toggle SPI Clock
 
-            DONE:
-            begin
+                    // Sample/Shift on falling edges of our internal generated sclk logic
+                    if(sclk == 1'b0)
+                    begin
+                        mosi <= tx_shift[31];
 
-                cs   <= 1;
-                sclk <= 0;
+                        tx_shift <= {tx_shift[30:0], 1'b0};
+                        rx_shift <= {rx_shift[30:0], miso};
 
-                rx_reg <= rx_shift;
+                        if(bit_cnt == 6'd31)
+                            state <= DONE;
+                        else
+                            bit_cnt <= bit_cnt + 1'b1;
+                    end
+                end
 
-                state <= IDLE;
+                DONE:
+                begin
+                    cs     <= 1'b1; // Pull CS high
+                    sclk   <= 1'b0;
+                    rx_reg <= rx_shift; // Save captured word to readable register
+                    state  <= IDLE;
+                end
 
-            end
+                default: state <= IDLE;
 
-        endcase
-
+            endcase
+        end
     end
-end
 
-//----------------------------------
-// APB READ
-//----------------------------------
-
-always_comb
-begin
-
-    PRDATA = 32'h0;
-
-    if(PSEL && !PWRITE)
+    //=====================================================
+    // APB READ COMBINATIONAL LOGIC
+    //=====================================================
+    always_comb
     begin
-
-        if(PADDR == SPI_ADDR)
-            PRDATA = rx_reg;
-        else
-            PRDATA = 32'hDEADBEEF;
-
+        PRDATA = 32'h0;
+        if(PSEL && !PWRITE)
+        begin
+            if(PADDR == SPI_ADDR)
+                PRDATA = rx_reg;
+            else
+                PRDATA = 32'hDEADBEEF; // Unmapped read target inside peripheral
+        end
     end
 
-end
+    //=====================================================
+    // APB STATUS / PROTOCOL HANDSHAKE SIGNALS
+    //=====================================================
+    
+    // PREADY must stay high when IDLE so the master can execute its write instantly. 
+    // If the master attempts to access the core mid-transfer, it forces wait states until IDLE.
+    assign PREADY = (state == IDLE) ? 1'b1 : !(PSEL && PENABLE);
 
-assign PREADY  = 1'b1;
-
-assign PSLVERR =
-       (PSEL && PENABLE && (PADDR != SPI_ADDR));
+    // Assert protocol error if master attempts to access outside register range
+    assign PSLVERR = (PSEL && PENABLE && (PADDR != SPI_ADDR));
 
 endmodule
