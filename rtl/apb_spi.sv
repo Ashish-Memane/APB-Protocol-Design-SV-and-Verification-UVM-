@@ -19,6 +19,7 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
+
 module apb_spi
 (
     input  logic        PCLK,
@@ -41,34 +42,49 @@ module apb_spi
     output logic        cs
 );
 
-    // local_addr from apb_top maps SPI_TXDATA_ADDR (32'h0002_0000) down to zero
     localparam SPI_ADDR = 32'h0000_0000;
 
     logic [31:0] tx_reg;
     logic [31:0] rx_reg;
+    logic        tx_valid; // Handshake flag indicating new data is ready to shift
 
     logic [31:0] tx_shift;
     logic [31:0] rx_shift;
-
     logic [5:0]  bit_cnt;
 
-    typedef enum logic [1:0]
-    {
-        IDLE,
-        TRANSFER,
-        DONE
-    } spi_state_t;
-
+    typedef enum logic [1:0] { IDLE, TRANSFER, DONE } spi_state_t;
     spi_state_t state;
 
     //=====================================================
-    // SPI ENGINE & APB REGISTER WRITE
+    // PHASE 1: APB BUS REGISTER LATCHING (Synchronous Interface)
+    //=====================================================
+    always_ff @(posedge PCLK or negedge PRESETn)
+    begin
+        if(!PRESETn) begin
+            tx_reg   <= 32'h0;
+            tx_valid <= 1'b0;
+        end
+        else begin
+            // Clear valid flag once the SPI engine accepts the payload
+            if (state == IDLE && tx_valid) begin
+                tx_valid <= 1'b0;
+            end
+
+            // Capture incoming bus data immediately on a valid APB Access cycle
+            if(PSEL && PENABLE && PWRITE && (PADDR == SPI_ADDR) && PREADY) begin
+                tx_reg   <= PWDATA;
+                tx_valid <= 1'b1;
+            end
+        end
+    end
+
+    //=====================================================
+    // PHASE 2: SPI SERIAL ENGINE FSM (Background Processor)
     //=====================================================
     always_ff @(posedge PCLK or negedge PRESETn)
     begin
         if(!PRESETn)
         begin
-            tx_reg   <= 32'h0;
             rx_reg   <= 32'h0;
             tx_shift <= 32'h0;
             rx_shift <= 32'h0;
@@ -86,28 +102,25 @@ module apb_spi
                 begin
                     sclk <= 1'b0;
                     cs   <= 1'b1;
+                    mosi <= 1'b0;
 
-                    // Trigger the SPI engine only on a valid write setup/access phase
-                    if(PSEL && PENABLE && PWRITE && (PADDR == SPI_ADDR)) 
-                    begin
-                        tx_reg   <= PWDATA;
-                        tx_shift <= PWDATA;
+                    // Start shifting only when a fresh register write is captured
+                    if(tx_valid) begin
+                        tx_shift <= tx_reg;
                         rx_shift <= 32'h0;
                         bit_cnt  <= 6'd0;
-                        cs       <= 1'b0; // Drop chip-select to start physical transfer
+                        cs       <= 1'b0; 
                         state    <= TRANSFER;
                     end
                 end
 
                 TRANSFER:
                 begin
-                    sclk <= ~sclk; // Toggle SPI Clock
+                    sclk <= ~sclk;
 
-                    // Sample/Shift on falling edges of our internal generated sclk logic
                     if(sclk == 1'b0)
                     begin
                         mosi <= tx_shift[31];
-
                         tx_shift <= {tx_shift[30:0], 1'b0};
                         rx_shift <= {rx_shift[30:0], miso};
 
@@ -120,42 +133,35 @@ module apb_spi
 
                 DONE:
                 begin
-                    cs     <= 1'b1; // Pull CS high
+                    cs     <= 1'b1;
                     sclk   <= 1'b0;
-                    rx_reg <= rx_shift; // Save captured word to readable register
+                    rx_reg <= rx_shift; 
                     state  <= IDLE;
                 end
 
                 default: state <= IDLE;
-
             endcase
         end
     end
 
     //=====================================================
-    // APB READ COMBINATIONAL LOGIC
+    // PHASE 3: APB OUTPUT HANDSHAKE ROUTING
     //=====================================================
     always_comb
     begin
         PRDATA = 32'h0;
-        if(PSEL && !PWRITE)
-        begin
+        if(PSEL && !PWRITE) begin
             if(PADDR == SPI_ADDR)
                 PRDATA = rx_reg;
             else
-                PRDATA = 32'hDEADBEEF; // Unmapped read target inside peripheral
+                PRDATA = 32'hDEADBEEF;
         end
     end
 
-    //=====================================================
-    // APB STATUS / PROTOCOL HANDSHAKE SIGNALS
-    //=====================================================
-    
-    // PREADY must stay high when IDLE so the master can execute its write instantly. 
-    // If the master attempts to access the core mid-transfer, it forces wait states until IDLE.
-    assign PREADY = (state == IDLE) ? 1'b1 : !(PSEL && PENABLE);
+    // Assert backpressure (PREADY=0) if a transaction is already active 
+    // or if a newly written data payload is currently queued for shifting.
+    assign PREADY = (state == IDLE && !tx_valid) ? 1'b1 : 1'b0;
 
-    // Assert protocol error if master attempts to access outside register range
     assign PSLVERR = (PSEL && PENABLE && (PADDR != SPI_ADDR));
 
 endmodule
