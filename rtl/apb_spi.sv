@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
 // Company: 
-// Engineer: Ashish Memane
+// Engineer: 
 // 
 // Create Date: 19.05.2026 12:23:30
 // Design Name: 
@@ -21,11 +21,6 @@
 
 module apb_spi
 (
-
-    //==================================================
-    // APB INTERFACE
-    //==================================================
-
     input  logic        PCLK,
     input  logic        PRESETn,
 
@@ -40,450 +35,156 @@ module apb_spi
     output logic        PREADY,
     output logic        PSLVERR,
 
-    //==================================================
-    // SPI INTERFACE
-    //==================================================
-
-    output logic sclk,
-    output logic mosi,
-    input  logic miso,
-    output logic cs
-
+    output logic        sclk,
+    output logic        mosi,
+    input  logic        miso,
+    output logic        cs
 );
 
-    //==================================================
-    // REGISTER MAP
-    //==================================================
+localparam SPI_ADDR = 32'h0000_0000;
 
-    localparam TXDATA_ADDR  = 32'h0000_0000;
-    localparam RXDATA_ADDR  = 32'h0000_0004;
-    localparam STATUS_ADDR  = 32'h0000_0008;
-    localparam CONTROL_ADDR = 32'h0000_000C;
+logic [31:0] tx_reg;
+logic [31:0] rx_reg;
 
-    //==================================================
-    // INTERNAL REGISTERS
-    //==================================================
+logic [31:0] tx_shift;
+logic [31:0] rx_shift;
 
-    logic [31:0] tx_reg;
-    logic [31:0] rx_reg;
-    logic [31:0] status_reg;
-    logic [31:0] control_reg;
+logic [5:0] bit_cnt;
 
-    //--------------------------------------------------
-    // STATUS BITS
-    //--------------------------------------------------
-    // status_reg[0] = busy
-    // status_reg[1] = transfer_done
-    //--------------------------------------------------
+typedef enum logic [1:0]
+{
+    IDLE,
+    TRANSFER,
+    DONE
+} spi_state_t;
 
-    //==================================================
-    // SPI FSM
-    //==================================================
+spi_state_t state;
 
-    typedef enum logic [1:0]
-    {
-        IDLE,
-        START,
-        TRANSFER,
-        DONE
-    } spi_state_t;
+always_ff @(posedge PCLK or negedge PRESETn)
+begin
+    if(!PRESETn)
+    begin
+        tx_reg   <= 0;
+        rx_reg   <= 0;
 
-    spi_state_t spi_state;
+        tx_shift <= 0;
+        rx_shift <= 0;
 
-    //==================================================
-    // SHIFT REGISTERS
-    //==================================================
+        bit_cnt  <= 0;
 
-    logic [31:0] tx_shift_reg;
-    logic [31:0] rx_shift_reg;
+        state    <= IDLE;
 
-    logic [5:0] bit_count;
-
-    //==================================================
-    // APB HANDSHAKE
-    //==================================================
-
-    logic apb_write;
-
-    assign apb_write =
-            PSEL    &&
-            PENABLE &&
-            PWRITE  &&
-            PREADY;
-
-    //==================================================
-    // MAIN LOGIC
-    //==================================================
-
-    always_ff @(posedge PCLK or negedge PRESETn)
+        sclk     <= 0;
+        mosi     <= 0;
+        cs       <= 1;
+    end
+    else
     begin
 
-        if(!PRESETn)
+        //----------------------------------
+        // APB WRITE = START SPI
+        //----------------------------------
+        if(PSEL && PENABLE && PWRITE &&
+           PADDR == SPI_ADDR &&
+           state == IDLE)
         begin
 
-            //------------------------------------------
-            // REGISTERS
-            //------------------------------------------
+            tx_reg   <= PWDATA;
 
-            tx_reg      <= 32'h0;
-            rx_reg      <= 32'h0;
+            tx_shift <= PWDATA;
+            rx_shift <= 0;
 
-            status_reg  <= 32'h0;
-            control_reg <= 32'h0;
+            bit_cnt  <= 0;
 
-            //------------------------------------------
-            // SHIFT REGISTERS
-            //------------------------------------------
+            cs       <= 0;
 
-            tx_shift_reg <= 32'h0;
-            rx_shift_reg <= 32'h0;
-
-            //------------------------------------------
-            // COUNTER
-            //------------------------------------------
-
-            bit_count <= 6'd0;
-
-            //------------------------------------------
-            // FSM
-            //------------------------------------------
-
-            spi_state <= IDLE;
-
-            //------------------------------------------
-            // SPI SIGNALS
-            //------------------------------------------
-
-            sclk <= 1'b0;
-            mosi <= 1'b0;
-            cs   <= 1'b1;
+            state    <= TRANSFER;
 
         end
-        else
-        begin
 
-            //------------------------------------------
-            // APB WRITE
-            //------------------------------------------
+        //----------------------------------
+        // SPI FSM
+        //----------------------------------
+        case(state)
 
-            if(apb_write)
+            IDLE:
+            begin
+                sclk <= 0;
+                cs   <= 1;
+            end
+
+            TRANSFER:
             begin
 
-                case(PADDR)
+                sclk <= ~sclk;
 
-                    //----------------------------------
-                    // TX DATA REGISTER
-                    //----------------------------------
+                if(sclk == 0)
+                begin
 
-                    TXDATA_ADDR:
-                    begin
+                    mosi <= tx_shift[31];
 
-                        tx_reg <= PWDATA;
+                    tx_shift <=
+                    {
+                        tx_shift[30:0],
+                        1'b0
+                    };
 
-                    end
+                    rx_shift <=
+                    {
+                        rx_shift[30:0],
+                        miso
+                    };
 
-                    //----------------------------------
-                    // CONTROL REGISTER
-                    //----------------------------------
+                    if(bit_cnt == 31)
+                        state <= DONE;
+                    else
+                        bit_cnt <= bit_cnt + 1;
 
-                    CONTROL_ADDR:
-                    begin
-
-                        control_reg <= PWDATA;
-
-                        //----------------------------------
-                        // START TRANSFER
-                        //----------------------------------
-
-                        if(PWDATA[0] && (spi_state == IDLE))
-                        begin
-
-                            //----------------------------------
-                            // LOAD SHIFT REGISTERS
-                            //----------------------------------
-
-                            tx_shift_reg <= tx_reg;
-                            rx_shift_reg <= 32'h0;
-
-                            //----------------------------------
-                            // RESET COUNTER
-                            //----------------------------------
-
-                            bit_count <= 6'd0;
-
-                            //----------------------------------
-                            // STATUS
-                            //----------------------------------
-
-                            status_reg[0] <= 1'b1;
-                            status_reg[1] <= 1'b0;
-
-                            //----------------------------------
-                            // START FSM
-                            //----------------------------------
-
-                            spi_state <= START;
-
-                        end
-
-                    end
-
-                    default:
-                    begin
-                        // DO NOTHING
-                    end
-
-                endcase
+                end
 
             end
 
-            //------------------------------------------
-            // SPI FSM
-            //------------------------------------------
+            DONE:
+            begin
 
-            case(spi_state)
+                cs   <= 1;
+                sclk <= 0;
 
-                //--------------------------------------
-                // IDLE
-                //--------------------------------------
+                rx_reg <= rx_shift;
 
-                IDLE:
-                begin
+                state <= IDLE;
 
-                    sclk <= 1'b0;
-                    cs   <= 1'b1;
+            end
 
-                end
-
-                //--------------------------------------
-                // START
-                //--------------------------------------
-
-                START:
-                begin
-
-                    //----------------------------------
-                    // ASSERT CHIP SELECT
-                    //----------------------------------
-
-                    cs <= 1'b0;
-
-                    //----------------------------------
-                    // MOVE TO TRANSFER
-                    //----------------------------------
-
-                    spi_state <= TRANSFER;
-
-                end
-
-                //--------------------------------------
-                // TRANSFER
-                //--------------------------------------
-
-                TRANSFER:
-                begin
-
-                    //----------------------------------
-                    // TOGGLE CLOCK
-                    //----------------------------------
-
-                    sclk <= ~sclk;
-
-                    //----------------------------------
-                    // SHIFT ON RISING EDGE
-                    //----------------------------------
-
-                    if(sclk == 1'b0)
-                    begin
-
-                        //----------------------------------
-                        // DRIVE MOSI
-                        //----------------------------------
-
-                        mosi <= tx_shift_reg[31];
-
-                        //----------------------------------
-                        // SHIFT TX LEFT
-                        //----------------------------------
-
-                        tx_shift_reg <=
-                        {
-                            tx_shift_reg[30:0],
-                            1'b0
-                        };
-
-                        //----------------------------------
-                        // SAMPLE MISO
-                        //----------------------------------
-
-                        rx_shift_reg <=
-                        {
-                            rx_shift_reg[30:0],
-                            miso
-                        };
-
-                        //----------------------------------
-                        // BIT COUNT
-                        //----------------------------------
-
-                        if(bit_count == 6'd31)
-                        begin
-
-                            spi_state <= DONE;
-
-                        end
-                        else
-                        begin
-
-                            bit_count <= bit_count + 1'b1;
-
-                        end
-
-                    end
-
-                end
-
-                //--------------------------------------
-                // DONE
-                //--------------------------------------
-
-                DONE:
-                begin
-
-                    //----------------------------------
-                    // DEASSERT CHIP SELECT
-                    //----------------------------------
-
-                    cs <= 1'b1;
-
-                    //----------------------------------
-                    // STOP CLOCK
-                    //----------------------------------
-
-                    sclk <= 1'b0;
-
-                    //----------------------------------
-                    // STORE RX DATA
-                    //----------------------------------
-
-                    rx_reg <= rx_shift_reg;
-
-                    //----------------------------------
-                    // STATUS
-                    //----------------------------------
-
-                    status_reg[0] <= 1'b0;
-                    status_reg[1] <= 1'b1;
-
-                    //----------------------------------
-                    // CLEAR START BIT
-                    //----------------------------------
-
-                    control_reg[0] <= 1'b0;
-
-                    //----------------------------------
-                    // RETURN TO IDLE
-                    //----------------------------------
-
-                    spi_state <= IDLE;
-
-                end
-
-            endcase
-
-        end
+        endcase
 
     end
+end
 
-    //==================================================
-    // APB READ LOGIC
-    //==================================================
+//----------------------------------
+// APB READ
+//----------------------------------
 
-    always_comb
+always_comb
+begin
+
+    PRDATA = 32'h0;
+
+    if(PSEL && !PWRITE)
     begin
 
-        PRDATA = 32'h0;
-
-        if(PSEL && !PWRITE)
-        begin
-
-            case(PADDR)
-
-                TXDATA_ADDR:
-                    PRDATA = tx_reg;
-
-                RXDATA_ADDR:
-                    PRDATA = rx_reg;
-
-                STATUS_ADDR:
-                    PRDATA = status_reg;
-
-                CONTROL_ADDR:
-                    PRDATA = control_reg;
-
-                default:
-                    PRDATA = 32'hDEADBEEF;
-
-            endcase
-
-        end
+        if(PADDR == SPI_ADDR)
+            PRDATA = rx_reg;
+        else
+            PRDATA = 32'hDEADBEEF;
 
     end
 
-    //==================================================
-    // APB READY
-    //==================================================
+end
 
-    always_comb
-    begin
+assign PREADY  = 1'b1;
 
-        //----------------------------------------------
-        // DEFAULT READY
-        //----------------------------------------------
-
-        PREADY = 1'b1;
-
-        //----------------------------------------------
-        // STALL DURING SPI TRANSFER
-        //----------------------------------------------
-
-        if((spi_state == START) ||
-           (spi_state == TRANSFER))
-        begin
-
-            PREADY = 1'b0;
-
-        end
-
-    end
-
-    //==================================================
-    // APB ERROR
-    //==================================================
-
-    always_comb
-    begin
-
-        PSLVERR = 1'b0;
-
-        if(PSEL && PENABLE)
-        begin
-
-            case(PADDR)
-
-                TXDATA_ADDR,
-                RXDATA_ADDR,
-                STATUS_ADDR,
-                CONTROL_ADDR:
-                    PSLVERR = 1'b0;
-
-                default:
-                    PSLVERR = 1'b1;
-
-            endcase
-
-        end
-
-    end
+assign PSLVERR =
+       (PSEL && PENABLE && (PADDR != SPI_ADDR));
 
 endmodule
