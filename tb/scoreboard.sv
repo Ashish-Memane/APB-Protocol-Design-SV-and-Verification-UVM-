@@ -230,8 +230,8 @@ class scoreboard extends uvm_scoreboard;
         function void report_phase(uvm_phase phase);
 
                 super.report_phase(phase);
-                `uvm_info(get_type_name(),$sformatf("[WRITE] UART PKT COUNT : %0h || SPI PKT COUNT : %0h || GPIO PKT COUNT : %0h",uart_write_pkt_count, spi_write_pkt_count, gpio_write_pkt_count),UVM_LOW)
-                `uvm_info(get_type_name(),$sformatf("[READ] UART PKT COUNT : %0h || SPI PKT COUNT : %0h || GPIO PKT COUNT : %0h",uart_read_pkt_count, gpio_read_pkt_count, spi_read_pkt_count), UVM_LOW)
+                `uvm_info(get_type_name(),$sformatf("[WRITE] UART PKT COUNT : %0d || SPI PKT COUNT : %0d || GPIO PKT COUNT : %0d",uart_write_pkt_count, spi_write_pkt_count, gpio_write_pkt_count),UVM_LOW)
+                `uvm_info(get_type_name(),$sformatf("[READ] UART PKT COUNT : %0d || SPI PKT COUNT : %0d || GPIO PKT COUNT : %0d",uart_read_pkt_count, gpio_read_pkt_count, spi_read_pkt_count), UVM_LOW)
 
         endfunction : report_phase
 
