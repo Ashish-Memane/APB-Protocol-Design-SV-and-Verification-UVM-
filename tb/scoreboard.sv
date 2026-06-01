@@ -28,6 +28,60 @@ class scoreboard extends uvm_scoreboard;
                 super.new(name,parent);
         endfunction : new
 
+        covergroup peripheral_cg;
+                option.per_instance = 1;
+                option.comment      = "Subsystem Register Access and Data Coverage Map";
+
+                // 1. APB Bus Attributes
+                CP_APB_RW: coverpoint cov_apb.rw {
+                        bins READ  = {1'b0};
+                        bins WRITE = {1'b1};
+                }
+
+                CP_APB_ADDR: coverpoint cov_apb.addr {
+                        bins GPIO_OUT = {32'h0000_0000};
+                        bins GPIO_IN  = {32'h0000_0004};
+                        bins GPIO_DIR = {32'h0000_0008};
+                        bins UART_TX  = {32'h0001_0000};
+                        bins UART_RX  = {32'h0001_0004};
+                        bins SPI_REG  = {32'h0002_0000};
+                        bins SPI_RX   = {32'h0002_0004};
+                }
+
+                // Cross coverage to ensure every register was both read and written
+                CR_ADDR_X_RW: cross CP_APB_ADDR, CP_APB_RW {
+                        // Ignore invalid hardware accesses to avoid low coverage holes
+                        ignore_bins read_gpios_out = binsof(CP_APB_ADDR) intersect {32'h0000_0000} && binsof(CP_APB_RW) intersect {1'b0};
+                        ignore_bins write_gpios_in = binsof(CP_APB_ADDR) intersect {32'h0000_0004} && binsof(CP_APB_RW) intersect {1'b1};
+                }
+
+                // 2. UART Data Sampling
+                CP_UART_DATA: coverpoint cov_uart.data {
+                        bins ZERO          = {8'h00};
+                        bins ALL_ONES      = {8'hFF};
+                        bins WALKING_ONES  = {8'h01, 8'h02, 8'h04, 8'h08, 8'h10, 8'h20, 8'h40, 8'h80};
+                        bins DATA_RANGE[4] = {[8'h01:8'hFE]};
+                }
+
+                // 3. SPI Data Sampling
+                CP_SPI_TX_DATA: coverpoint cov_spi.tx_data {
+                        bins LOWER_HALF = {[32'h0000_0000 : 32'h7FFF_FFFF]};
+                        bins UPPER_HALF = {[32'h8000_0000 : 32'hFFFF_FFFF]};
+                }
+                
+                CP_SPI_RX_DATA: coverpoint cov_spi.rx_data {
+                        bins LOWER_HALF = {[32'h0000_0000 : 32'h7FFF_FFFF]};
+                        bins UPPER_HALF = {[32'h8000_0000 : 32'hFFFF_FFFF]};
+                }
+
+                // 4. GPIO Pin Walking Bit Densities
+                CP_GPIO_IN: coverpoint cov_gpio.gpio_in {
+                        bins ALL_LOW   = {32'h0000_0000};
+                        bins ALL_HIGH  = {32'hFFFF_FFFF];
+                        bins EXT_INPUT = {[32'h0000_0001 : 32'hFFFF_FFFE]};
+                }
+        endgroup : peripheral_cg
+
         // build phase
         function void build_phase(uvm_phase phase);
                 super.build_phase(phase);
