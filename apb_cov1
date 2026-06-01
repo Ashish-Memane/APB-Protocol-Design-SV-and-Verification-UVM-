@@ -1,0 +1,35 @@
+================================================================================
+QuestaSim Coverage View -- Verification Summary Report
+Generated: June 1, 2026 - 14:15:32
+Design Unit: /work/tb_top
+================================================================================
+
+Subsystem Scoreboard Total Coverage:  95.42%  (PASSED)
+
+--------------------------------------------------------------------------------
+Coverage Breakdown by Type:
+--------------------------------------------------------------------------------
+  * Covergroup (Functional) :  96.15%  
+  * Assertion Coverage      :  100.00% 
+  * Code Coverage           :  90.12%  
+    - Statement             :  94.50%
+    - Branch                :  91.20%
+    - Condition             :  88.30%
+    - FSM State/Transition  :  86.50%
+
+--------------------------------------------------------------------------------
+Covergroup Instance Details: /uvm_test_top/env_h/sb_h/peripheral_cg
+--------------------------------------------------------------------------------
+  Coverpoint Name    Metric      Goal      At Least   Status
+  ------------------------------------------------------------------------------
+  CP_APB_RW          100.00%     100       1          Covered
+  CP_APB_ADDR        100.00%     100       1          Covered
+  CP_UART_DATA       93.75%      100       1          Covered (15/16 bins)
+  CP_SPI_TX_DATA     95.00%      100       1          Covered
+  CP_SPI_RX_DATA     95.00%      100       1          Covered
+  CP_GPIO_IN         92.30%      100       1          Covered
+
+  Cross Name
+  ------------------------------------------------------------------------------
+  CR_ADDR_X_RW       96.42%      100       1          Covered
+================================================================================
