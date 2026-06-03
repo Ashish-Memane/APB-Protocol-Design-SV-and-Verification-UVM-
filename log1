@@ -1,0 +1,85 @@
+# UVM_INFO ../uart_agent/uart_monitor.sv(35) @ 55: uvm_test_top.env_h.slave_agt_top_h.uart_agt_h.uart_monitor [UART_MON] Reset cleared. Synchronizing threads.
+# UVM_INFO ../apb_agent_top/apb_monitor.sv(65) @ 115: uvm_test_top.env_h.apb_agt_top_h.agt_h.mon_h [APB_MONITOR] ADDR=20000 WDATA=d4512096 RDATA=0 RW=1 ERR=0
+# UVM_INFO ../apb_agent_top/apb_driver.sv(84) @ 115: uvm_test_top.env_h.apb_agt_top_h.agt_h.drv_h [apb_driver] TRANSFER COMPLETE -> ADDR=20000 WDATA=d4512096 RDATA=0 RW=1
+# UVM_INFO ../spi_agent/spi_monitor.sv(41) @ 125: uvm_test_top.env_h.slave_agt_top_h.spi_agt_h.mon_h [SPI_MON] CS LOW DETECTED
+# UVM_INFO ../spi_agent/spi_monitor.sv(57) @ 745: uvm_test_top.env_h.slave_agt_top_h.spi_agt_h.mon_h [SPI_MON] SPI PACKET COLLECTED: MOSI = d4512096  MISO = 0
+# UVM_INFO ../tb/scoreboard.sv(188) @ 745: uvm_test_top.env_h.sb_h [scoreboard] [SUCCESSFUL] : APB WRITE DATA = d4512096 ||| SPI DATA = d4512096
+# UVM_INFO ../spi_agent/spi_monitor.sv(63) @ 765: uvm_test_top.env_h.slave_agt_top_h.spi_agt_h.mon_h [SPI_MON] CS HIGH DETECTED
+# UVM_INFO ../apb_agent_top/apb_monitor.sv(65) @ 775: uvm_test_top.env_h.apb_agt_top_h.agt_h.mon_h [APB_MONITOR] ADDR=20000 WDATA=9f92d009 RDATA=0 RW=1 ERR=0
+# UVM_INFO ../apb_agent_top/apb_driver.sv(84) @ 775: uvm_test_top.env_h.apb_agt_top_h.agt_h.drv_h [apb_driver] TRANSFER COMPLETE -> ADDR=20000 WDATA=9f92d009 RDATA=0 RW=1
+# UVM_INFO ../spi_agent/spi_monitor.sv(41) @ 785: uvm_test_top.env_h.slave_agt_top_h.spi_agt_h.mon_h [SPI_MON] CS LOW DETECTED
+# UVM_INFO ../spi_agent/spi_monitor.sv(57) @ 1405: uvm_test_top.env_h.slave_agt_top_h.spi_agt_h.mon_h [SPI_MON] SPI PACKET COLLECTED: MOSI = 9f92d009  MISO = 0
+# UVM_INFO ../tb/scoreboard.sv(188) @ 1405: uvm_test_top.env_h.sb_h [scoreboard] [SUCCESSFUL] : APB WRITE DATA = 9f92d009 ||| SPI DATA = 9f92d009
+# UVM_INFO ../spi_agent/spi_monitor.sv(63) @ 1425: uvm_test_top.env_h.slave_agt_top_h.spi_agt_h.mon_h [SPI_MON] CS HIGH DETECTED
+# UVM_INFO ../apb_agent_top/apb_monitor.sv(65) @ 1435: uvm_test_top.env_h.apb_agt_top_h.agt_h.mon_h [APB_MONITOR] ADDR=20000 WDATA=4060f530 RDATA=0 RW=1 ERR=0
+# UVM_INFO ../apb_agent_top/apb_driver.sv(84) @ 1435: uvm_test_top.env_h.apb_agt_top_h.agt_h.drv_h [apb_driver] TRANSFER COMPLETE -> ADDR=20000 WDATA=4060f530 RDATA=0 RW=1
+# UVM_INFO ../spi_agent/spi_monitor.sv(41) @ 1445: uvm_test_top.env_h.slave_agt_top_h.spi_agt_h.mon_h [SPI_MON] CS LOW DETECTED
+# UVM_INFO ../spi_agent/spi_monitor.sv(57) @ 2065: uvm_test_top.env_h.slave_agt_top_h.spi_agt_h.mon_h [SPI_MON] SPI PACKET COLLECTED: MOSI = 4060f530  MISO = 0
+# UVM_INFO ../tb/scoreboard.sv(188) @ 2065: uvm_test_top.env_h.sb_h [scoreboard] [SUCCESSFUL] : APB WRITE DATA = 4060f530 ||| SPI DATA = 4060f530
+# UVM_INFO ../spi_agent/spi_monitor.sv(63) @ 2085: uvm_test_top.env_h.slave_agt_top_h.spi_agt_h.mon_h [SPI_MON] CS HIGH DETECTED
+# UVM_INFO ../apb_agent_top/apb_monitor.sv(65) @ 2095: uvm_test_top.env_h.apb_agt_top_h.agt_h.mon_h [APB_MONITOR] ADDR=20000 WDATA=de12f2f4 RDATA=0 RW=1 ERR=0
+# UVM_INFO ../apb_agent_top/apb_driver.sv(84) @ 2095: uvm_test_top.env_h.apb_agt_top_h.agt_h.drv_h [apb_driver] TRANSFER COMPLETE -> ADDR=20000 WDATA=de12f2f4 RDATA=0 RW=1
+# UVM_INFO ../spi_agent/spi_monitor.sv(41) @ 2105: uvm_test_top.env_h.slave_agt_top_h.spi_agt_h.mon_h [SPI_MON] CS LOW DETECTED
+# UVM_INFO ../spi_agent/spi_monitor.sv(57) @ 2725: uvm_test_top.env_h.slave_agt_top_h.spi_agt_h.mon_h [SPI_MON] SPI PACKET COLLECTED: MOSI = de12f2f4  MISO = 0
+# UVM_INFO ../tb/scoreboard.sv(188) @ 2725: uvm_test_top.env_h.sb_h [scoreboard] [SUCCESSFUL] : APB WRITE DATA = de12f2f4 ||| SPI DATA = de12f2f4
+# UVM_INFO ../spi_agent/spi_monitor.sv(63) @ 2745: uvm_test_top.env_h.slave_agt_top_h.spi_agt_h.mon_h [SPI_MON] CS HIGH DETECTED
+# UVM_INFO ../apb_agent_top/apb_monitor.sv(65) @ 2755: uvm_test_top.env_h.apb_agt_top_h.agt_h.mon_h [APB_MONITOR] ADDR=20000 WDATA=57dd8f84 RDATA=0 RW=1 ERR=0
+# UVM_INFO ../apb_agent_top/apb_driver.sv(84) @ 2755: uvm_test_top.env_h.apb_agt_top_h.agt_h.drv_h [apb_driver] TRANSFER COMPLETE -> ADDR=20000 WDATA=57dd8f84 RDATA=0 RW=1
+# UVM_INFO ../spi_agent/spi_monitor.sv(41) @ 2765: uvm_test_top.env_h.slave_agt_top_h.spi_agt_h.mon_h [SPI_MON] CS LOW DETECTED
+# UVM_INFO ../spi_agent/spi_monitor.sv(57) @ 3385: uvm_test_top.env_h.slave_agt_top_h.spi_agt_h.mon_h [SPI_MON] SPI PACKET COLLECTED: MOSI = 57dd8f84  MISO = 0
+# UVM_INFO ../tb/scoreboard.sv(188) @ 3385: uvm_test_top.env_h.sb_h [scoreboard] [SUCCESSFUL] : APB WRITE DATA = 57dd8f84 ||| SPI DATA = 57dd8f84
+# UVM_INFO ../spi_agent/spi_monitor.sv(63) @ 3405: uvm_test_top.env_h.slave_agt_top_h.spi_agt_h.mon_h [SPI_MON] CS HIGH DETECTED
+# UVM_INFO ../apb_agent_top/apb_monitor.sv(65) @ 3415: uvm_test_top.env_h.apb_agt_top_h.agt_h.mon_h [APB_MONITOR] ADDR=20000 WDATA=ef3c785a RDATA=0 RW=1 ERR=0
+# UVM_INFO ../apb_agent_top/apb_driver.sv(84) @ 3415: uvm_test_top.env_h.apb_agt_top_h.agt_h.drv_h [apb_driver] TRANSFER COMPLETE -> ADDR=20000 WDATA=ef3c785a RDATA=0 RW=1
+# UVM_INFO ../spi_agent/spi_monitor.sv(41) @ 3425: uvm_test_top.env_h.slave_agt_top_h.spi_agt_h.mon_h [SPI_MON] CS LOW DETECTED
+# UVM_INFO ../spi_agent/spi_monitor.sv(57) @ 4045: uvm_test_top.env_h.slave_agt_top_h.spi_agt_h.mon_h [SPI_MON] SPI PACKET COLLECTED: MOSI = ef3c785a  MISO = 0
+# UVM_INFO ../tb/scoreboard.sv(188) @ 4045: uvm_test_top.env_h.sb_h [scoreboard] [SUCCESSFUL] : APB WRITE DATA = ef3c785a ||| SPI DATA = ef3c785a
+# UVM_INFO ../spi_agent/spi_monitor.sv(63) @ 4065: uvm_test_top.env_h.slave_agt_top_h.spi_agt_h.mon_h [SPI_MON] CS HIGH DETECTED
+# UVM_INFO ../apb_agent_top/apb_monitor.sv(65) @ 4075: uvm_test_top.env_h.apb_agt_top_h.agt_h.mon_h [APB_MONITOR] ADDR=20000 WDATA=b4f3341a RDATA=0 RW=1 ERR=0
+# UVM_INFO ../apb_agent_top/apb_driver.sv(84) @ 4075: uvm_test_top.env_h.apb_agt_top_h.agt_h.drv_h [apb_driver] TRANSFER COMPLETE -> ADDR=20000 WDATA=b4f3341a RDATA=0 RW=1
+# UVM_INFO ../spi_agent/spi_monitor.sv(41) @ 4085: uvm_test_top.env_h.slave_agt_top_h.spi_agt_h.mon_h [SPI_MON] CS LOW DETECTED
+# UVM_INFO ../spi_agent/spi_monitor.sv(57) @ 4705: uvm_test_top.env_h.slave_agt_top_h.spi_agt_h.mon_h [SPI_MON] SPI PACKET COLLECTED: MOSI = b4f3341a  MISO = 0
+# UVM_INFO ../tb/scoreboard.sv(188) @ 4705: uvm_test_top.env_h.sb_h [scoreboard] [SUCCESSFUL] : APB WRITE DATA = b4f3341a ||| SPI DATA = b4f3341a
+# UVM_INFO ../spi_agent/spi_monitor.sv(63) @ 4725: uvm_test_top.env_h.slave_agt_top_h.spi_agt_h.mon_h [SPI_MON] CS HIGH DETECTED
+# UVM_INFO ../apb_agent_top/apb_monitor.sv(65) @ 4735: uvm_test_top.env_h.apb_agt_top_h.agt_h.mon_h [APB_MONITOR] ADDR=20000 WDATA=b58b371a RDATA=0 RW=1 ERR=0
+# UVM_INFO ../apb_agent_top/apb_driver.sv(84) @ 4735: uvm_test_top.env_h.apb_agt_top_h.agt_h.drv_h [apb_driver] TRANSFER COMPLETE -> ADDR=20000 WDATA=b58b371a RDATA=0 RW=1
+# UVM_INFO ../spi_agent/spi_monitor.sv(41) @ 4745: uvm_test_top.env_h.slave_agt_top_h.spi_agt_h.mon_h [SPI_MON] CS LOW DETECTED
+# UVM_INFO ../spi_agent/spi_monitor.sv(57) @ 5365: uvm_test_top.env_h.slave_agt_top_h.spi_agt_h.mon_h [SPI_MON] SPI PACKET COLLECTED: MOSI = b58b371a  MISO = 0
+# UVM_INFO ../tb/scoreboard.sv(188) @ 5365: uvm_test_top.env_h.sb_h [scoreboard] [SUCCESSFUL] : APB WRITE DATA = b58b371a ||| SPI DATA = b58b371a
+# UVM_INFO ../spi_agent/spi_monitor.sv(63) @ 5385: uvm_test_top.env_h.slave_agt_top_h.spi_agt_h.mon_h [SPI_MON] CS HIGH DETECTED
+# UVM_INFO ../apb_agent_top/apb_monitor.sv(65) @ 5395: uvm_test_top.env_h.apb_agt_top_h.agt_h.mon_h [APB_MONITOR] ADDR=20000 WDATA=fb6d7fe8 RDATA=0 RW=1 ERR=0
+# UVM_INFO ../apb_agent_top/apb_driver.sv(84) @ 5395: uvm_test_top.env_h.apb_agt_top_h.agt_h.drv_h [apb_driver] TRANSFER COMPLETE -> ADDR=20000 WDATA=fb6d7fe8 RDATA=0 RW=1
+# UVM_INFO ../spi_agent/spi_monitor.sv(41) @ 5405: uvm_test_top.env_h.slave_agt_top_h.spi_agt_h.mon_h [SPI_MON] CS LOW DETECTED
+# UVM_INFO ../spi_agent/spi_monitor.sv(57) @ 6025: uvm_test_top.env_h.slave_agt_top_h.spi_agt_h.mon_h [SPI_MON] SPI PACKET COLLECTED: MOSI = fb6d7fe8  MISO = 0
+# UVM_INFO ../tb/scoreboard.sv(188) @ 6025: uvm_test_top.env_h.sb_h [scoreboard] [SUCCESSFUL] : APB WRITE DATA = fb6d7fe8 ||| SPI DATA = fb6d7fe8
+# UVM_INFO ../spi_agent/spi_monitor.sv(63) @ 6045: uvm_test_top.env_h.slave_agt_top_h.spi_agt_h.mon_h [SPI_MON] CS HIGH DETECTED
+# UVM_INFO ../apb_agent_top/apb_monitor.sv(65) @ 6055: uvm_test_top.env_h.apb_agt_top_h.agt_h.mon_h [APB_MONITOR] ADDR=20000 WDATA=a3b5bb50 RDATA=0 RW=1 ERR=0
+# UVM_INFO ../apb_agent_top/apb_driver.sv(84) @ 6055: uvm_test_top.env_h.apb_agt_top_h.agt_h.drv_h [apb_driver] TRANSFER COMPLETE -> ADDR=20000 WDATA=a3b5bb50 RDATA=0 RW=1
+# UVM_INFO verilog_src/uvm-1.1d/src/base/uvm_objection.svh(1267) @ 6055: reporter [TEST_DONE] 'run' phase is ready to proceed to the 'extract' phase
+# UVM_INFO ../test/apb_vtest_lib.sv(121) @ 6055: uvm_test_top [TEST_BASE] Sequence loop items processed. Securing a 1000ns drain window.
+# UVM_INFO ../tb/scoreboard.sv(233) @ 6055: uvm_test_top.env_h.sb_h [scoreboard] [WRITE] UART PKT COUNT : 0 || SPI PKT COUNT : 9 || GPIO PKT COUNT : 0
+# UVM_INFO ../tb/scoreboard.sv(234) @ 6055: uvm_test_top.env_h.sb_h [scoreboard] [READ] UART PKT COUNT : 0 || SPI PKT COUNT : 0 || GPIO PKT COUNT : 0
+#
+# --- UVM Report Summary ---
+#
+# ** Report counts by severity
+# UVM_INFO :   65
+# UVM_WARNING :    0
+# UVM_ERROR :    0
+# UVM_FATAL :    0
+# ** Report counts by id
+# [APB_MONITOR]    10
+# [Questa UVM]     2
+# [RNTST]     1
+# [SPI_MON]    27
+# [TEST_BASE]     1
+# [TEST_DONE]     1
+# [UART_MON]     1
+# [UVMTOP]     1
+# [apb_driver]    10
+# [scoreboard]    11
+# ** Note: $finish    : /home/cad/eda/Mentor_Graphics/Questasim/questasim/linux_x86_64/../verilog_src/uvm-1.1d/src/base/uvm_root.svh(430)
+#    Time: 6055 ns  Iteration: 68  Instance: /top
+# Saving coverage database on exit...
+# End time: 23:40:07 on Jun 03,2026, Elapsed time: 0:00:01
+# Errors: 0, Warnings: 1
