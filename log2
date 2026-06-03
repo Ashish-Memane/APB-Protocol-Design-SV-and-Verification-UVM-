@@ -1,0 +1,112 @@
+# UVM_INFO ../apb_agent_top/apb_seqs.sv(207) @ 0: uvm_test_top.env_h.apb_agt_top_h.agt_h.seqr_h@@seq_h [APB_SEQ] Waiting for physical UART RX wire frame...
+# UVM_INFO ../uart_agent/uart_monitor.sv(35) @ 55: uvm_test_top.env_h.slave_agt_top_h.uart_agt_h.uart_monitor [UART_MON] Reset cleared. Synchronizing threads.
+# UVM_INFO ../uart_agent/uart_monitor.sv(88) @ 475: uvm_test_top.env_h.slave_agt_top_h.uart_agt_h.uart_monitor [UART_MON_RX] Monitored External RX Incoming Packet = f93bd022
+# UVM_INFO ../uart_agent/uart_driver.sv(60) @ 485: uvm_test_top.env_h.slave_agt_top_h.uart_agt_h.drv_h [UART_DRV] UART RX DRIVEN DATA = f93bd022
+# UVM_INFO ../uart_agent/uart_seqs.sv(40) @ 485: uvm_test_top.env_h.slave_agt_top_h.uart_agt_h.seqr_h@@uart_seq [UART_SEQ] UART RX DATA = f93bd022
+# UVM_INFO ../apb_agent_top/apb_seqs.sv(218) @ 515: uvm_test_top.env_h.apb_agt_top_h.agt_h.seqr_h@@seq_h [APB_SEQ] Frame detected! Pulling data word via APB Master.
+# UVM_INFO ../apb_agent_top/apb_monitor.sv(65) @ 605: uvm_test_top.env_h.apb_agt_top_h.agt_h.mon_h [APB_MONITOR] ADDR=10004 WDATA=4c48f8e5 RDATA=f93bd022 RW=0 ERR=0
+# UVM_INFO ../apb_agent_top/apb_driver.sv(84) @ 605: uvm_test_top.env_h.apb_agt_top_h.agt_h.drv_h [apb_driver] TRANSFER COMPLETE -> ADDR=10004 WDATA=4c48f8e5 RDATA=f93bd022 RW=0
+# UVM_INFO ../tb/scoreboard.sv(172) @ 605: uvm_test_top.env_h.sb_h [scoreboard] [SUCCESSFUL] : APB READ DATA = f93bd022 ||| UART DATA = f93bd022
+# UVM_INFO ../apb_agent_top/apb_seqs.sv(207) @ 605: uvm_test_top.env_h.apb_agt_top_h.agt_h.seqr_h@@seq_h [APB_SEQ] Waiting for physical UART RX wire frame...
+# UVM_INFO ../uart_agent/uart_monitor.sv(88) @ 915: uvm_test_top.env_h.slave_agt_top_h.uart_agt_h.uart_monitor [UART_MON_RX] Monitored External RX Incoming Packet = 310fb6b2
+# UVM_INFO ../uart_agent/uart_driver.sv(60) @ 925: uvm_test_top.env_h.slave_agt_top_h.uart_agt_h.drv_h [UART_DRV] UART RX DRIVEN DATA = 310fb6b2
+# UVM_INFO ../uart_agent/uart_seqs.sv(40) @ 925: uvm_test_top.env_h.slave_agt_top_h.uart_agt_h.seqr_h@@uart_seq [UART_SEQ] UART RX DATA = 310fb6b2
+# UVM_INFO ../apb_agent_top/apb_seqs.sv(218) @ 955: uvm_test_top.env_h.apb_agt_top_h.agt_h.seqr_h@@seq_h [APB_SEQ] Frame detected! Pulling data word via APB Master.
+# UVM_INFO ../apb_agent_top/apb_monitor.sv(65) @ 1045: uvm_test_top.env_h.apb_agt_top_h.agt_h.mon_h [APB_MONITOR] ADDR=10004 WDATA=406981e5 RDATA=310fb6b2 RW=0 ERR=0
+# UVM_INFO ../apb_agent_top/apb_driver.sv(84) @ 1045: uvm_test_top.env_h.apb_agt_top_h.agt_h.drv_h [apb_driver] TRANSFER COMPLETE -> ADDR=10004 WDATA=406981e5 RDATA=310fb6b2 RW=0
+# UVM_INFO ../tb/scoreboard.sv(172) @ 1045: uvm_test_top.env_h.sb_h [scoreboard] [SUCCESSFUL] : APB READ DATA = 310fb6b2 ||| UART DATA = 310fb6b2
+# UVM_INFO ../apb_agent_top/apb_seqs.sv(207) @ 1045: uvm_test_top.env_h.apb_agt_top_h.agt_h.seqr_h@@seq_h [APB_SEQ] Waiting for physical UART RX wire frame...
+# UVM_INFO ../uart_agent/uart_monitor.sv(88) @ 1355: uvm_test_top.env_h.slave_agt_top_h.uart_agt_h.uart_monitor [UART_MON_RX] Monitored External RX Incoming Packet = 746cc9b2
+# UVM_INFO ../uart_agent/uart_driver.sv(60) @ 1365: uvm_test_top.env_h.slave_agt_top_h.uart_agt_h.drv_h [UART_DRV] UART RX DRIVEN DATA = 746cc9b2
+# UVM_INFO ../uart_agent/uart_seqs.sv(40) @ 1365: uvm_test_top.env_h.slave_agt_top_h.uart_agt_h.seqr_h@@uart_seq [UART_SEQ] UART RX DATA = 746cc9b2
+# UVM_INFO ../apb_agent_top/apb_seqs.sv(218) @ 1395: uvm_test_top.env_h.apb_agt_top_h.agt_h.seqr_h@@seq_h [APB_SEQ] Frame detected! Pulling data word via APB Master.
+# UVM_INFO ../apb_agent_top/apb_monitor.sv(65) @ 1485: uvm_test_top.env_h.apb_agt_top_h.agt_h.mon_h [APB_MONITOR] ADDR=10004 WDATA=24807eec RDATA=746cc9b2 RW=0 ERR=0
+# UVM_INFO ../apb_agent_top/apb_driver.sv(84) @ 1485: uvm_test_top.env_h.apb_agt_top_h.agt_h.drv_h [apb_driver] TRANSFER COMPLETE -> ADDR=10004 WDATA=24807eec RDATA=746cc9b2 RW=0
+# UVM_INFO ../tb/scoreboard.sv(172) @ 1485: uvm_test_top.env_h.sb_h [scoreboard] [SUCCESSFUL] : APB READ DATA = 746cc9b2 ||| UART DATA = 746cc9b2
+# UVM_INFO ../apb_agent_top/apb_seqs.sv(207) @ 1485: uvm_test_top.env_h.apb_agt_top_h.agt_h.seqr_h@@seq_h [APB_SEQ] Waiting for physical UART RX wire frame...
+# UVM_INFO ../uart_agent/uart_monitor.sv(88) @ 1795: uvm_test_top.env_h.slave_agt_top_h.uart_agt_h.uart_monitor [UART_MON_RX] Monitored External RX Incoming Packet = a079f953
+# UVM_INFO ../uart_agent/uart_driver.sv(60) @ 1805: uvm_test_top.env_h.slave_agt_top_h.uart_agt_h.drv_h [UART_DRV] UART RX DRIVEN DATA = a079f953
+# UVM_INFO ../uart_agent/uart_seqs.sv(40) @ 1805: uvm_test_top.env_h.slave_agt_top_h.uart_agt_h.seqr_h@@uart_seq [UART_SEQ] UART RX DATA = a079f953
+# UVM_INFO ../apb_agent_top/apb_seqs.sv(218) @ 1835: uvm_test_top.env_h.apb_agt_top_h.agt_h.seqr_h@@seq_h [APB_SEQ] Frame detected! Pulling data word via APB Master.
+# UVM_INFO ../apb_agent_top/apb_monitor.sv(65) @ 1925: uvm_test_top.env_h.apb_agt_top_h.agt_h.mon_h [APB_MONITOR] ADDR=10004 WDATA=d232ecaf RDATA=a079f953 RW=0 ERR=0
+# UVM_INFO ../apb_agent_top/apb_driver.sv(84) @ 1925: uvm_test_top.env_h.apb_agt_top_h.agt_h.drv_h [apb_driver] TRANSFER COMPLETE -> ADDR=10004 WDATA=d232ecaf RDATA=a079f953 RW=0
+# UVM_INFO ../tb/scoreboard.sv(172) @ 1925: uvm_test_top.env_h.sb_h [scoreboard] [SUCCESSFUL] : APB READ DATA = a079f953 ||| UART DATA = a079f953
+# UVM_INFO ../apb_agent_top/apb_seqs.sv(207) @ 1925: uvm_test_top.env_h.apb_agt_top_h.agt_h.seqr_h@@seq_h [APB_SEQ] Waiting for physical UART RX wire frame...
+# UVM_INFO ../uart_agent/uart_monitor.sv(88) @ 2235: uvm_test_top.env_h.slave_agt_top_h.uart_agt_h.uart_monitor [UART_MON_RX] Monitored External RX Incoming Packet = 24d5bed2
+# UVM_INFO ../uart_agent/uart_driver.sv(60) @ 2245: uvm_test_top.env_h.slave_agt_top_h.uart_agt_h.drv_h [UART_DRV] UART RX DRIVEN DATA = 24d5bed2
+# UVM_INFO ../uart_agent/uart_seqs.sv(40) @ 2245: uvm_test_top.env_h.slave_agt_top_h.uart_agt_h.seqr_h@@uart_seq [UART_SEQ] UART RX DATA = 24d5bed2
+# UVM_INFO ../apb_agent_top/apb_seqs.sv(218) @ 2275: uvm_test_top.env_h.apb_agt_top_h.agt_h.seqr_h@@seq_h [APB_SEQ] Frame detected! Pulling data word via APB Master.
+# UVM_INFO ../apb_agent_top/apb_monitor.sv(65) @ 2365: uvm_test_top.env_h.apb_agt_top_h.agt_h.mon_h [APB_MONITOR] ADDR=10004 WDATA=a203593c RDATA=24d5bed2 RW=0 ERR=0
+# UVM_INFO ../apb_agent_top/apb_driver.sv(84) @ 2365: uvm_test_top.env_h.apb_agt_top_h.agt_h.drv_h [apb_driver] TRANSFER COMPLETE -> ADDR=10004 WDATA=a203593c RDATA=24d5bed2 RW=0
+# UVM_INFO ../tb/scoreboard.sv(172) @ 2365: uvm_test_top.env_h.sb_h [scoreboard] [SUCCESSFUL] : APB READ DATA = 24d5bed2 ||| UART DATA = 24d5bed2
+# UVM_INFO ../apb_agent_top/apb_seqs.sv(207) @ 2365: uvm_test_top.env_h.apb_agt_top_h.agt_h.seqr_h@@seq_h [APB_SEQ] Waiting for physical UART RX wire frame...
+# UVM_INFO ../uart_agent/uart_monitor.sv(88) @ 2675: uvm_test_top.env_h.slave_agt_top_h.uart_agt_h.uart_monitor [UART_MON_RX] Monitored External RX Incoming Packet = e06b4da7
+# UVM_INFO ../uart_agent/uart_driver.sv(60) @ 2685: uvm_test_top.env_h.slave_agt_top_h.uart_agt_h.drv_h [UART_DRV] UART RX DRIVEN DATA = e06b4da7
+# UVM_INFO ../uart_agent/uart_seqs.sv(40) @ 2685: uvm_test_top.env_h.slave_agt_top_h.uart_agt_h.seqr_h@@uart_seq [UART_SEQ] UART RX DATA = e06b4da7
+# UVM_INFO ../apb_agent_top/apb_seqs.sv(218) @ 2715: uvm_test_top.env_h.apb_agt_top_h.agt_h.seqr_h@@seq_h [APB_SEQ] Frame detected! Pulling data word via APB Master.
+# UVM_INFO ../apb_agent_top/apb_monitor.sv(65) @ 2805: uvm_test_top.env_h.apb_agt_top_h.agt_h.mon_h [APB_MONITOR] ADDR=10004 WDATA=7fb1d7c1 RDATA=e06b4da7 RW=0 ERR=0
+# UVM_INFO ../apb_agent_top/apb_driver.sv(84) @ 2805: uvm_test_top.env_h.apb_agt_top_h.agt_h.drv_h [apb_driver] TRANSFER COMPLETE -> ADDR=10004 WDATA=7fb1d7c1 RDATA=e06b4da7 RW=0
+# UVM_INFO ../tb/scoreboard.sv(172) @ 2805: uvm_test_top.env_h.sb_h [scoreboard] [SUCCESSFUL] : APB READ DATA = e06b4da7 ||| UART DATA = e06b4da7
+# UVM_INFO ../apb_agent_top/apb_seqs.sv(207) @ 2805: uvm_test_top.env_h.apb_agt_top_h.agt_h.seqr_h@@seq_h [APB_SEQ] Waiting for physical UART RX wire frame...
+# UVM_INFO ../uart_agent/uart_monitor.sv(88) @ 3115: uvm_test_top.env_h.slave_agt_top_h.uart_agt_h.uart_monitor [UART_MON_RX] Monitored External RX Incoming Packet = 5f08580f
+# UVM_INFO ../uart_agent/uart_driver.sv(60) @ 3125: uvm_test_top.env_h.slave_agt_top_h.uart_agt_h.drv_h [UART_DRV] UART RX DRIVEN DATA = 5f08580f
+# UVM_INFO ../uart_agent/uart_seqs.sv(40) @ 3125: uvm_test_top.env_h.slave_agt_top_h.uart_agt_h.seqr_h@@uart_seq [UART_SEQ] UART RX DATA = 5f08580f
+# UVM_INFO ../apb_agent_top/apb_seqs.sv(218) @ 3155: uvm_test_top.env_h.apb_agt_top_h.agt_h.seqr_h@@seq_h [APB_SEQ] Frame detected! Pulling data word via APB Master.
+# UVM_INFO ../apb_agent_top/apb_monitor.sv(65) @ 3245: uvm_test_top.env_h.apb_agt_top_h.agt_h.mon_h [APB_MONITOR] ADDR=10004 WDATA=8ed1d3b1 RDATA=5f08580f RW=0 ERR=0
+# UVM_INFO ../apb_agent_top/apb_driver.sv(84) @ 3245: uvm_test_top.env_h.apb_agt_top_h.agt_h.drv_h [apb_driver] TRANSFER COMPLETE -> ADDR=10004 WDATA=8ed1d3b1 RDATA=5f08580f RW=0
+# UVM_INFO ../tb/scoreboard.sv(172) @ 3245: uvm_test_top.env_h.sb_h [scoreboard] [SUCCESSFUL] : APB READ DATA = 5f08580f ||| UART DATA = 5f08580f
+# UVM_INFO ../apb_agent_top/apb_seqs.sv(207) @ 3245: uvm_test_top.env_h.apb_agt_top_h.agt_h.seqr_h@@seq_h [APB_SEQ] Waiting for physical UART RX wire frame...
+# UVM_INFO ../uart_agent/uart_monitor.sv(88) @ 3555: uvm_test_top.env_h.slave_agt_top_h.uart_agt_h.uart_monitor [UART_MON_RX] Monitored External RX Incoming Packet = 8bd8dfc8
+# UVM_INFO ../uart_agent/uart_driver.sv(60) @ 3565: uvm_test_top.env_h.slave_agt_top_h.uart_agt_h.drv_h [UART_DRV] UART RX DRIVEN DATA = 8bd8dfc8
+# UVM_INFO ../uart_agent/uart_seqs.sv(40) @ 3565: uvm_test_top.env_h.slave_agt_top_h.uart_agt_h.seqr_h@@uart_seq [UART_SEQ] UART RX DATA = 8bd8dfc8
+# UVM_INFO ../apb_agent_top/apb_seqs.sv(218) @ 3595: uvm_test_top.env_h.apb_agt_top_h.agt_h.seqr_h@@seq_h [APB_SEQ] Frame detected! Pulling data word via APB Master.
+# UVM_INFO ../apb_agent_top/apb_monitor.sv(65) @ 3685: uvm_test_top.env_h.apb_agt_top_h.agt_h.mon_h [APB_MONITOR] ADDR=10004 WDATA=13b18eb0 RDATA=8bd8dfc8 RW=0 ERR=0
+# UVM_INFO ../apb_agent_top/apb_driver.sv(84) @ 3685: uvm_test_top.env_h.apb_agt_top_h.agt_h.drv_h [apb_driver] TRANSFER COMPLETE -> ADDR=10004 WDATA=13b18eb0 RDATA=8bd8dfc8 RW=0
+# UVM_INFO ../tb/scoreboard.sv(172) @ 3685: uvm_test_top.env_h.sb_h [scoreboard] [SUCCESSFUL] : APB READ DATA = 8bd8dfc8 ||| UART DATA = 8bd8dfc8
+# UVM_INFO ../apb_agent_top/apb_seqs.sv(207) @ 3685: uvm_test_top.env_h.apb_agt_top_h.agt_h.seqr_h@@seq_h [APB_SEQ] Waiting for physical UART RX wire frame...
+# UVM_INFO ../uart_agent/uart_monitor.sv(88) @ 3995: uvm_test_top.env_h.slave_agt_top_h.uart_agt_h.uart_monitor [UART_MON_RX] Monitored External RX Incoming Packet = ecaa1fb5
+# UVM_INFO ../uart_agent/uart_driver.sv(60) @ 4005: uvm_test_top.env_h.slave_agt_top_h.uart_agt_h.drv_h [UART_DRV] UART RX DRIVEN DATA = ecaa1fb5
+# UVM_INFO ../uart_agent/uart_seqs.sv(40) @ 4005: uvm_test_top.env_h.slave_agt_top_h.uart_agt_h.seqr_h@@uart_seq [UART_SEQ] UART RX DATA = ecaa1fb5
+# UVM_INFO ../apb_agent_top/apb_seqs.sv(218) @ 4035: uvm_test_top.env_h.apb_agt_top_h.agt_h.seqr_h@@seq_h [APB_SEQ] Frame detected! Pulling data word via APB Master.
+# UVM_INFO ../apb_agent_top/apb_monitor.sv(65) @ 4125: uvm_test_top.env_h.apb_agt_top_h.agt_h.mon_h [APB_MONITOR] ADDR=10004 WDATA=c07f9095 RDATA=ecaa1fb5 RW=0 ERR=0
+# UVM_INFO ../apb_agent_top/apb_driver.sv(84) @ 4125: uvm_test_top.env_h.apb_agt_top_h.agt_h.drv_h [apb_driver] TRANSFER COMPLETE -> ADDR=10004 WDATA=c07f9095 RDATA=ecaa1fb5 RW=0
+# UVM_INFO ../tb/scoreboard.sv(172) @ 4125: uvm_test_top.env_h.sb_h [scoreboard] [SUCCESSFUL] : APB READ DATA = ecaa1fb5 ||| UART DATA = ecaa1fb5
+# UVM_INFO ../apb_agent_top/apb_seqs.sv(207) @ 4125: uvm_test_top.env_h.apb_agt_top_h.agt_h.seqr_h@@seq_h [APB_SEQ] Waiting for physical UART RX wire frame...
+# UVM_INFO ../uart_agent/uart_monitor.sv(88) @ 4435: uvm_test_top.env_h.slave_agt_top_h.uart_agt_h.uart_monitor [UART_MON_RX] Monitored External RX Incoming Packet = 401da69b
+# UVM_INFO ../uart_agent/uart_driver.sv(60) @ 4445: uvm_test_top.env_h.slave_agt_top_h.uart_agt_h.drv_h [UART_DRV] UART RX DRIVEN DATA = 401da69b
+# UVM_INFO ../uart_agent/uart_seqs.sv(40) @ 4445: uvm_test_top.env_h.slave_agt_top_h.uart_agt_h.seqr_h@@uart_seq [UART_SEQ] UART RX DATA = 401da69b
+# UVM_INFO ../apb_agent_top/apb_seqs.sv(218) @ 4475: uvm_test_top.env_h.apb_agt_top_h.agt_h.seqr_h@@seq_h [APB_SEQ] Frame detected! Pulling data word via APB Master.
+# UVM_INFO ../apb_agent_top/apb_monitor.sv(65) @ 4515: uvm_test_top.env_h.apb_agt_top_h.agt_h.mon_h [APB_MONITOR] ADDR=10004 WDATA=e88220d1 RDATA=401da69b RW=0 ERR=0
+# UVM_INFO ../apb_agent_top/apb_driver.sv(84) @ 4515: uvm_test_top.env_h.apb_agt_top_h.agt_h.drv_h [apb_driver] TRANSFER COMPLETE -> ADDR=10004 WDATA=e88220d1 RDATA=401da69b RW=0
+# UVM_INFO ../tb/scoreboard.sv(172) @ 4515: uvm_test_top.env_h.sb_h [scoreboard] [SUCCESSFUL] : APB READ DATA = 401da69b ||| UART DATA = 401da69b
+# UVM_INFO verilog_src/uvm-1.1d/src/base/uvm_objection.svh(1267) @ 4515: reporter [TEST_DONE] 'run' phase is ready to proceed to the 'extract' phase
+# UVM_INFO ../test/apb_vtest_lib.sv(121) @ 4515: uvm_test_top [TEST_BASE] Sequence loop items processed. Securing a 1000ns drain window.
+# UVM_INFO ../tb/scoreboard.sv(233) @ 4515: uvm_test_top.env_h.sb_h [scoreboard] [WRITE] UART PKT COUNT : 0 || SPI PKT COUNT : 0 || GPIO PKT COUNT : 0
+# UVM_INFO ../tb/scoreboard.sv(234) @ 4515: uvm_test_top.env_h.sb_h [scoreboard] [READ] UART PKT COUNT : 10 || SPI PKT COUNT : 0 || GPIO PKT COUNT : 0
+#
+# --- UVM Report Summary ---
+#
+# ** Report counts by severity
+# UVM_INFO :   89
+# UVM_WARNING :    0
+# UVM_ERROR :    0
+# UVM_FATAL :    0
+# ** Report counts by id
+# [APB_MONITOR]    10
+# [APB_SEQ]    20
+# [Questa UVM]     2
+# [RNTST]     1
+# [TEST_BASE]     1
+# [TEST_DONE]     1
+# [UART_DRV]    10
+# [UART_MON]     1
+# [UART_MON_RX]    10
+# [UART_SEQ]    10
+# [UVMTOP]     1
+# [apb_driver]    10
+# [scoreboard]    12
+# ** Note: $finish    : /home/cad/eda/Mentor_Graphics/Questasim/questasim/linux_x86_64/../verilog_src/uvm-1.1d/src/base/uvm_root.svh(430)
+#    Time: 4515 ns  Iteration: 67  Instance: /top
+# Saving coverage database on exit...
+# End time: 23:40:05 on Jun 03,2026, Elapsed time: 0:00:01
+# Errors: 0, Warnings: 1
