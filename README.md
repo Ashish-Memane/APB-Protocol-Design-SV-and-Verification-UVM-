@@ -1,5 +1,9 @@
-# APB-Protocol-Design-SV-and-Verification-UVM-
+# APB-Protocol-Design-SV-and-Verification-UVM-Formal_verification
 Developed  an APB protocol with one master and three slaves (UART, SPI and GPIO) and verified it with the UVM TB.
+
+## 🚀 Verification Features
+* **Universal Verification Methodology (UVM):** Full dynamic simulation-based environment testing comprehensive chip functionality.
+* **Formal Verification (SVA + JasperGold):** Added complete formal property modules (`*__fv.sv`) and automated Tcl compilation execution setups to mathematically guarantee exhaustive protocol compliancy across the APB Master, Interconnect, and individual sub-slaves (GPIO, UART, SPI). [Tool - JasperGold]
 
 📘 APB Protocol Design & Verification (RTL + UVM Ready)
 📌 Overview
@@ -141,3 +145,6 @@ uvm_tb/
 │   └── apb_base_test.sv
 │
 └── tb_top.sv
+
+Formal verification files under the formal_verification(JasperGold) directory. 
+
