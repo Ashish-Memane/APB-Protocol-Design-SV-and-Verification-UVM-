@@ -108,3 +108,28 @@ module apb_spi_fv (
     );
 
 endmodule
+
+
+bind apb_spi apb_spi_fv u_apb_spi_fv_bind (
+    .PCLK       (PCLK),
+    .PRESETn    (PRESETn),
+    .PSEL       (PSEL),
+    .PENABLE    (PENABLE),
+    .PWRITE     (PWRITE),
+    .PADDR      (PADDR),
+    .PWDATA     (PWDATA),
+    .PRDATA     (PRDATA),
+    .PREADY     (PREADY),
+    .PSLVERR    (PSLVERR),
+    .sclk       (sclk),
+    .mosi       (mosi),
+    .miso       (miso),
+    .cs         (cs),
+    
+    // Direct internal module scoping
+    .tx_reg     (tx_reg),
+    .rx_reg     (rx_reg),
+    .tx_valid   (tx_valid),
+    .bit_cnt    (bit_cnt),
+    .state      (state)
+);
