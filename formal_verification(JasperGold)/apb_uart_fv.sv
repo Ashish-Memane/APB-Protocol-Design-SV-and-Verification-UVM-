@@ -129,3 +129,31 @@ module apb_uart_fv (
     );
 
 endmodule
+
+// bind the module
+bind apb_uart apb_uart_fv u_apb_uart_fv_bind (
+    .PCLK          (PCLK),
+    .PRESETn       (PRESETn),
+    .PSEL          (PSEL),
+    .PENABLE       (PENABLE),
+    .PWRITE        (PWRITE),
+    .PADDR         (PADDR),
+    .PWDATA        (PWDATA),
+    .PRDATA        (PRDATA),
+    .PREADY        (PREADY),
+    .PSLVERR       (PSLVERR),
+    .tx            (tx),
+    .rx            (rx),
+    
+    // Linking internal structural variables
+    .tx_reg        (tx_reg),
+    .rx_reg        (rx_reg),
+    .status_reg    (status_reg),
+    .tx_state      (tx_state),
+    .rx_state      (rx_state),
+    .tx_start      (tx_start),
+    .bit_count     (bit_count),
+    .byte_count    (byte_count),
+    .rx_bit_count  (rx_bit_count),
+    .rx_byte_count (rx_byte_count)
+);
